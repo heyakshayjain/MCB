@@ -1,30 +1,20 @@
-// Fetch data from the published Google Sheet
-$.ajax({
-  url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_eTUgtYbWTu9UZ_Gu-AR_azLomICPRO58g9uOm2fhB6d6vXY61_jclvrjImAUHFhkCW4lIFNvbRQ1/pubhtml?gid=0&single=true',
-  dataType: 'text',
-}).done(function(data) {
-  // Parse CSV data into an array of objects
-  var careerOptions = $.csv.toObjects(data);
-  
-  // Function to display all career options
-  function displayCareerOptions() {
-    var careerOptionsList = $('#careerOptionsList');
-    careerOptionsList.empty();
-    for (var i = 0; i < careerOptions.length; i++) {
-      var careerOption = careerOptions[i];
-      var listItem = $('<li>').text(careerOption.CareerOption);
-      careerOptionsList.append(listItem);
-    }
-  }
+// Function to fetch data from Google Sheets API
+function fetchData() {
+  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQ_eTUgtYbWTu9UZ_Gu-AR_azLomICPRO58g9uOm2fhB6d6vXY61_jclvrjImAUHFhkCW4lIFNvbRQ1/pubhtml?gid=0&single=true')
+    .then(response => response.text())
+    .then(data => {
+      // Parse the data as HTML
+      const parser = new DOMParser();
+      const htmlDoc = parser.parseFromString(data, 'text/html');
+      // Get the table element
+      const table = htmlDoc.querySelector('table');
+      // Append the table to the data container
+      const dataContainer = document.getElementById('data-container');
+      dataContainer.innerHTML = table.outerHTML;
+    })
+    .catch(error => console.error(error));
+}
 
-  // Display all career options initially
-  displayCareerOptions();
-  
-  // Button click event to display all career options
-  $('#showAllBtn').on('click', function() {
-    displayCareerOptions();
-  });
-
-}).fail(function(jqXHR, textStatus, errorThrown) {
-  console.error('Failed to fetch data from Google Sheet:', errorThrown);
-});
+// Add event listener to "Show All" button
+const showAllButton = document.getElementById('show-all-button');
+showAllButton.addEventListener('click', fetchData);

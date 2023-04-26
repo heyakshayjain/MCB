@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Career Options</title>
+  <title style="color: #ff5a5f;">Career Options</title> <!-- Updated title color -->
   <!-- Add any CSS links or styles here -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0.10/dist/tailwind.min.css" rel="stylesheet">
 
 </head>
-<body>
-  <h1>Career Options</h1>
-  <input type="text" id="searchInput" placeholder="Search by Career Option">
+<body class="flex flex-col items-center justify-center min-h-screen"> <!-- Added flex classes for centering -->
+  <div class="flex items-center justify-center mb-8"> <!-- Added flex classes for centering -->
+    <h1 class="text-4xl font-bold mr-4">MCB</h1> <!-- Updated heading styles for logo -->
+    <input type="text" id="searchInput" placeholder="Search by Career Option" class="rounded-l-md px-4 py-2 outline-none"> <!-- Added input styles -->
+    <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-r-md px-4 py-2">Search</button> <!-- Added search button styles -->
+  </div>
   <ul id="careerOptionsList"></ul>
 
   <!-- Add any JavaScript links or scripts here -->

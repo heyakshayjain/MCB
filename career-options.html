@@ -1,18 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title style="color: #ff5a5f;">Career Options</title> <!-- Updated title color -->
+  <title style="color: #ff5a5f;">Career Options</title>
   <!-- Add any CSS links or styles here -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.0.10/dist/tailwind.min.css" rel="stylesheet">
-
+  <style>
+    /* Custom CSS for light and dark theme toggle */
+    body {
+      transition: background-color 0.3s ease;
+    }
+    .bg-light {
+      background-color: #f3f4f6;
+    }
+    .bg-dark {
+      background-color: #1f2937;
+    }
+    .text-light {
+      color: #1f2937;
+    }
+    .text-dark {
+      color: #f3f4f6;
+    }
+  </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen"> <!-- Added flex classes for centering -->
-  <div class="flex items-center justify-center mb-8"> <!-- Added flex classes for centering -->
-    <h1 class="text-4xl font-bold mr-4">MCB</h1> <!-- Updated heading styles for logo -->
-    <input type="text" id="searchInput" placeholder="Search by Career Option" class="rounded-l-md px-4 py-2 outline-none"> <!-- Added input styles -->
-    <button id="searchButton" class="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-r-md px-4 py-2">Search</button> <!-- Added search button styles -->
+<body class="flex flex-col items-center justify-center min-h-screen bg-light text-light"> <!-- Updated body class for light theme -->
+  <div class="flex items-center justify-center mb-8">
+    <h1 class="text-4xl font-bold mr-4">MCB</h1>
+    <input type="text" id="searchInput" placeholder="Search by Career Option" class="rounded-l-md px-4 py-2 outline-none">
+    <button id="searchBtn" class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-r-md">Search</button> <!-- Updated button styles -->
   </div>
-  <ul id="careerOptionsList"></ul>
+  <ul id="careerOptionsList" class="text-center">
+  </ul>
+
+  <div class="absolute top-0 right-0 mt-4 mr-4">
+    <label for="themeToggle" class="inline-flex items-center cursor-pointer">
+      <span class="mr-2">Toggle Theme</span>
+      <div class="relative">
+        <input type="checkbox" id="themeToggle" class="sr-only">
+        <div class="block bg-white w-10 h-6 rounded-full"></div>
+        <div class="dot absolute left-1 top-1 bg-light w-4 h-4 rounded-full transition"></div> <!-- Updated dot color for light theme -->
+        <div class="dot absolute right-1 top-1 bg-dark w-4 h-4 rounded-full transition"></div> <!-- Updated dot color for dark theme -->
+      </div>
+    </label>
+  </div>
 
   <!-- Add any JavaScript links or scripts here -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

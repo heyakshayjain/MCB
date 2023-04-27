@@ -6,45 +6,31 @@
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <style>
-    /* Custom CSS for light and dark theme toggle */
-    body {
-      transition: background-color 0.3s ease;
+  <script>
+    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark')
     }
-    .bg-light {
-      background-color: #f3f4f6;
-    }
-    .bg-dark {
-      background-color: #1f2937;
-    }
-    .text-light {
-      color: #1f2937;
-    }
-    .text-dark {
-      color: #f3f4f6;
-    }
-  </style>
-</head>
-<body class="flex flex-col items-center justify-center min-h-screen bg-light text-light"> <!-- Updated body class for light theme -->
-  <div class="flex items-center justify-center mb-8">
-    <h1 class="text-4xl font-bold mr-4">MCB</h1>
-    <input type="text" id="searchInput" placeholder="Search by Career Option" class="rounded-l-md px-4 py-2 outline-none">
-    <button id="searchBtn" class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-r-md">Search</button> <!-- Updated button styles -->
-  </div>
-  <ul id="careerOptionsList" class="text-center">
-  </ul>
+</script>
+  </head>
+  <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+</button>
+ 
+<form>   
+    <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <input type="search" id="default-search" class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Mockups, Logos..." required>
+        <button type="submit" class="text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+    </div>
+</form>
 
-  <div class="absolute top-0 right-0 mt-4 mr-4">
-    <label for="themeToggle" class="inline-flex items-center cursor-pointer">
-      <span class="mr-2">Toggle Theme</span>
-      <div class="relative">
-        <input type="checkbox" id="themeToggle" class="sr-only">
-        <div class="block bg-white w-10 h-6 rounded-full"></div>
-        <div class="dot absolute left-1 top-1 bg-light w-4 h-4 rounded-full transition"></div> <!-- Updated dot color for light theme -->
-        <div class="dot absolute right-1 top-1 bg-dark w-4 h-4 rounded-full transition"></div> <!-- Updated dot color for dark theme -->
-      </div>
-    </label>
-  </div>
 <!-- Add "Show All" button -->
 <button id="show-all-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded">Show All</button>
 

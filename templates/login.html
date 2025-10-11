@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - MCB{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col s12 m8 offset-m2 l6 offset-l3">
+            <div class="card login-card">
+                <div class="card-content center-align">
+                    <!-- App Logo -->
+                    <div class="section">
+                        <i class="large material-icons blue-text text-darken-2">school</i>
+                        <h4 class="blue-text text-darken-2">MCB</h4>
+                        <h6 class="grey-text">Track your college applications and exam registrations in one place</h6>
+                    </div>
+
+                    <!-- Sign in Options -->
+                    <div class="section">
+                        <a href="#" class="btn-large white black-text waves-effect google-signin">
+                            <img src="{{ url_for('static', filename='images/google.svg') }}" alt="Google" class="google-icon">
+                            Sign in with Google
+                        </a>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="section">
+                        <div class="row">
+                            <div class="col s12">
+                                <div class="divider-text">
+                                    <span class="grey-text">or</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Login Form -->
+                    <div class="section">
+                        <form action="{{ url_for('login') }}" method="POST">
+                            <div class="input-field">
+                                <i class="material-icons prefix">email</i>
+                                <input id="email" type="email" class="validate" required>
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="input-field">
+                                <i class="material-icons prefix">lock</i>
+                                <input id="password" type="password" class="validate" required>
+                                <label for="password">Password</label>
+                            </div>
+                            <div class="row mb-0">
+                                <div class="col s12">
+                                    <label>
+                                        <input type="checkbox" />
+                                        <span>Remember me</span>
+                                    </label>
+                                    <a href="#" class="right blue-text text-darken-2">Forgot Password?</a>
+                                </div>
+                            </div>
+                            <div class="section">
+                                <button type="submit" class="btn-large blue darken-2 waves-effect waves-light full-width">
+                                    Sign In
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Sign Up Link -->
+                    <div class="section grey-text">
+                        Don't have an account? 
+                        <a href="#" class="blue-text text-darken-2">Sign up</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Links -->
+            <div class="center-align grey-text text-darken-1">
+                <small>
+                    By continuing, you agree to MCB's 
+                    <a href="#" class="blue-text text-darken-2">Terms of Service</a> and 
+                    <a href="#" class="blue-text text-darken-2">Privacy Policy</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize form validation if needed
+        var inputs = document.querySelectorAll('input');
+        M.updateTextFields();
+    });
+</script>
+{% endblock %}

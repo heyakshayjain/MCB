@@ -1,0 +1,433 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - MCB{% endblock %}
+
+{% block content %}
+<!-- Featured News Carousel -->
+<div class="featured-news">
+    <div class="carousel carousel-slider" data-indicators="true">
+        <a class="carousel-item" href="#one" style="background-image: url('/static/images/news-1.jpg');">
+            <div class="carousel-content">
+                <span class="badge red white-text">Breaking</span>
+                <h5>Early Decision Deadlines Extended for Selected Universities</h5>
+                <p>Major universities announce deadline extensions due to technical issues in their application systems.</p>
+            </div>
+        </a>
+        <a class="carousel-item" href="#two" style="background-image: url('/static/images/news-2.jpg');">
+            <div class="carousel-content">
+                <span class="badge blue white-text">College News</span>
+                <h5>New SAT Format Announced for 2026</h5>
+                <p>College Board reveals digital-first testing approach with adaptive questions and shorter duration.</p>
+            </div>
+        </a>
+        <a class="carousel-item" href="#three" style="background-image: url('/static/images/news-3.jpg');">
+            <div class="carousel-content">
+                <span class="badge green white-text">Application Tip</span>
+                <h5>Essay Writing Workshop Next Week</h5>
+                <p>Join our virtual workshop with admission officers from top universities to perfect your essays.</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-wrapper">
+<div class="dashboard-wrapper">
+    <!-- KPI Cards Row -->
+    <div class="row">
+        <!-- Active Applications -->
+        <div class="col s12 m6 l3">
+            <div class="card kpi-card waves-effect waves-light hoverable" onclick="location.href='/applications'">
+                <div class="card-content blue-gradient">
+                    <span class="card-title white-text">Active Applications</span>
+                    <div class="kpi-value">
+                        <div class="kpi-main">
+                            <span class="number white-text">12</span>
+                            <div class="kpi-trend green-text text-lighten-4">
+                                <i class="material-icons tiny">arrow_upward</i>
+                                <span>+25%</span>
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="material-icons large white-text">description</i>
+                        </div>
+                    </div>
+                    <div class="kpi-subtitle white-text">
+                        3 new this week
+                    </div>
+                    <div class="progress">
+                        <div class="determinate white" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div class="col s12 m6 l3">
+            <div class="card kpi-card waves-effect waves-light hoverable" onclick="location.href='/deadlines'">
+                <div class="card-content red-gradient">
+                    <span class="card-title white-text">Upcoming Deadlines</span>
+                    <div class="kpi-value">
+                        <div class="kpi-main">
+                            <span class="number white-text">5</span>
+                            <div class="kpi-trend red-text text-lighten-4">
+                                <i class="material-icons tiny">priority_high</i>
+                                <span>Urgent</span>
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="material-icons large white-text">event</i>
+                        </div>
+                    </div>
+                    <div class="kpi-subtitle white-text">
+                        Next: Stanford EA (2 days)
+                    </div>
+                    <div class="progress">
+                        <div class="determinate white" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Ready -->
+        <div class="col s12 m6 l3">
+            <div class="card kpi-card waves-effect waves-light hoverable" onclick="location.href='/documents'">
+                <div class="card-content green-gradient">
+                    <span class="card-title white-text">Documents Ready</span>
+                    <div class="kpi-value">
+                        <div class="kpi-main">
+                            <span class="number white-text">80%</span>
+                            <div class="progress-ring">
+                                <svg class="progress-ring-circle" width="36" height="36">
+                                    <circle class="progress-ring-circle-bg" cx="18" cy="18" r="16"></circle>
+                                    <circle class="progress-ring-circle-fg" cx="18" cy="18" r="16" style="stroke-dashoffset: 20"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="material-icons large white-text">check_circle</i>
+                        </div>
+                    </div>
+                    <div class="kpi-subtitle white-text">
+                        2 documents pending review
+                    </div>
+                    <div class="progress">
+                        <div class="determinate white" style="width: 80%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Days Until Exam -->
+        <div class="col s12 m6 l3">
+            <div class="card kpi-card waves-effect waves-light hoverable" onclick="location.href='/exams'">
+                <div class="card-content orange-gradient">
+                    <span class="card-title white-text">Days Until SAT</span>
+                    <div class="kpi-value">
+                        <div class="kpi-main">
+                            <span class="number white-text countdown">15</span>
+                            <div class="kpi-trend white-text">
+                                <i class="material-icons tiny">schedule</i>
+                                <span>Days</span>
+                            </div>
+                        </div>
+                        <div class="kpi-icon">
+                            <i class="material-icons large white-text">timer</i>
+                        </div>
+                    </div>
+                    <div class="kpi-subtitle white-text">
+                        Study plan: On track
+                    </div>
+                    <div class="progress">
+                        <div class="determinate white" style="width: 65%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row">
+        <!-- News Feed -->
+        <div class="col s12 l8">
+            <div class="card news-feed">
+                <div class="card-content">
+                    <div class="news-header-row">
+                        <span class="card-title">Latest Updates</span>
+                        <div class="news-filters">
+                            <a class="dropdown-trigger btn-flat" href="#" data-target="news-filter">
+                                All Categories <i class="material-icons right">arrow_drop_down</i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- News Item 1 -->
+                    <div class="news-item waves-effect hoverable">
+                        <div class="news-thumbnail">
+                            <img src="https://via.placeholder.com/80" alt="MIT News">
+                        </div>
+                        <div class="news-content">
+                            <div class="news-meta">
+                                <span class="chip blue white-text">College News</span>
+                                <span class="news-date grey-text">2 hours ago</span>
+                            </div>
+                            <h6 class="truncate-text">MIT Announces New Application Requirements for 2026</h6>
+                            <p class="grey-text truncate-text">Changes include optional standardized testing and expanded essay options...</p>
+                            <a href="#" class="news-link">
+                                Read More <i class="material-icons tiny">arrow_forward</i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+
+                    <!-- News Item 2 -->
+                    <div class="news-item waves-effect hoverable">
+                        <div class="news-thumbnail">
+                            <img src="https://via.placeholder.com/80" alt="Scholarship News">
+                            <span class="new badge red">New</span>
+                        </div>
+                        <div class="news-content">
+                            <div class="news-meta">
+                                <span class="chip green white-text">Scholarship</span>
+                                <span class="news-date grey-text">5 hours ago</span>
+                            </div>
+                            <h6 class="truncate-text">New Merit Scholarship Program Announced</h6>
+                            <p class="grey-text truncate-text">Full-ride scholarships available for STEM students with exceptional achievements in research and innovation...</p>
+                            <a href="#" class="news-link">
+                                Read More <i class="material-icons tiny">arrow_forward</i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+
+                    <!-- News Item 3 -->
+                    <div class="news-item waves-effect hoverable">
+                        <div class="news-thumbnail">
+                            <img src="https://via.placeholder.com/80" alt="Deadline Alert">
+                            <span class="new badge orange">Urgent</span>
+                        </div>
+                        <div class="news-content">
+                            <div class="news-meta">
+                                <span class="chip orange white-text">Deadline Alert</span>
+                                <span class="news-date grey-text">1 day ago</span>
+                            </div>
+                            <h6 class="truncate-text">Early Decision Deadline Approaching</h6>
+                            <p class="grey-text truncate-text">Remember to submit your applications before November 1st. Check our guide for last-minute tips...</p>
+                            <a href="#" class="news-link">
+                                Read More <i class="material-icons tiny">arrow_forward</i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+
+                    <!-- News Item 4 -->
+                    <div class="news-item waves-effect hoverable">
+                        <div class="news-thumbnail">
+                            <img src="https://via.placeholder.com/80" alt="Application Tip">
+                        </div>
+                        <div class="news-content">
+                            <div class="news-meta">
+                                <span class="chip purple white-text">Application Tip</span>
+                                <span class="news-date grey-text">2 days ago</span>
+                            </div>
+                            <h6 class="truncate-text">5 Common Essay Writing Mistakes to Avoid</h6>
+                            <p class="grey-text truncate-text">Expert admission officers share insights on what makes a compelling college essay...</p>
+                            <a href="#" class="news-link">
+                                Read More <i class="material-icons tiny">arrow_forward</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="#" class="blue-text waves-effect">View All Updates</a>
+                    <a href="#" class="blue-text waves-effect right">Subscribe to Alerts</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Filter Dropdown -->
+        <ul id="news-filter" class="dropdown-content">
+            <li><a href="#!"><i class="material-icons">all_inclusive</i>All Categories</a></li>
+            <li><a href="#!"><i class="material-icons">school</i>College News</a></li>
+            <li><a href="#!"><i class="material-icons">event_note</i>Deadlines</a></li>
+            <li><a href="#!"><i class="material-icons">lightbulb</i>Application Tips</a></li>
+            <li><a href="#!"><i class="material-icons">card_giftcard</i>Scholarships</a></li>
+        </ul>
+
+        <!-- Timeline -->
+        <div class="col s12 l4">
+            <div class="card">
+                <div class="card-content">
+                    <div class="deadline-header">
+                        <span class="card-title">Upcoming Deadlines</span>
+                        <a class="dropdown-trigger btn-flat" href="#" data-target="deadline-filter">
+                            This Week <i class="material-icons right">arrow_drop_down</i>
+                        </a>
+                    </div>
+                    
+                    <div class="timeline">
+                        <!-- Urgent Deadline -->
+                        <div class="timeline-item red-text waves-effect">
+                            <div class="timeline-icon red pulse">
+                                <i class="material-icons tiny white-text">priority_high</i>
+                            </div>
+                            <div class="timeline-content hoverable">
+                                <div class="timeline-header">
+                                    <span class="timeline-tag red white-text">Early Action</span>
+                                    <span class="timeline-date">Oct 15 (3 days)</span>
+                                </div>
+                                <h6>Stanford University</h6>
+                                <p class="grey-text">Application submission deadline</p>
+                                <div class="timeline-status">
+                                    <div class="status-badge in-progress">
+                                        <i class="material-icons tiny">edit</i>
+                                        In Progress
+                                    </div>
+                                    <button class="btn-floating btn-small waves-effect waves-light red">
+                                        <i class="material-icons">send</i>
+                                    </button>
+                                </div>
+                                <div class="timeline-progress">
+                                    <div class="progress">
+                                        <div class="determinate red" style="width: 80%"></div>
+                                    </div>
+                                    <span class="progress-text">80% Complete</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Deadline -->
+                        <div class="timeline-item orange-text waves-effect">
+                            <div class="timeline-icon orange">
+                                <i class="material-icons tiny white-text">event</i>
+                            </div>
+                            <div class="timeline-content hoverable">
+                                <div class="timeline-header">
+                                    <span class="timeline-tag orange white-text">Test Registration</span>
+                                    <span class="timeline-date">Oct 20 (8 days)</span>
+                                </div>
+                                <h6>SAT December Test Date</h6>
+                                <p class="grey-text">Last day to register for December SAT</p>
+                                <div class="timeline-status">
+                                    <div class="status-badge not-started">
+                                        <i class="material-icons tiny">schedule</i>
+                                        Not Started
+                                    </div>
+                                    <button class="btn-floating btn-small waves-effect waves-light orange">
+                                        <i class="material-icons">add</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Future Deadline -->
+                        <div class="timeline-item blue-text waves-effect">
+                            <div class="timeline-icon blue">
+                                <i class="material-icons tiny white-text">school</i>
+                            </div>
+                            <div class="timeline-content hoverable">
+                                <div class="timeline-header">
+                                    <span class="timeline-tag blue white-text">Regular Decision</span>
+                                    <span class="timeline-date">Nov 1 (20 days)</span>
+                                </div>
+                                <h6>Multiple Universities</h6>
+                                <p class="grey-text">Common App submission deadline</p>
+                                <div class="timeline-status">
+                                    <div class="status-badge not-started">
+                                        <i class="material-icons tiny">schedule</i>
+                                        Not Started
+                                    </div>
+                                    <button class="btn-floating btn-small waves-effect waves-light blue">
+                                        <i class="material-icons">add</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- More Deadline -->
+                        <div class="timeline-item green-text waves-effect">
+                            <div class="timeline-icon green">
+                                <i class="material-icons tiny white-text">card_giftcard</i>
+                            </div>
+                            <div class="timeline-content hoverable">
+                                <div class="timeline-header">
+                                    <span class="timeline-tag green white-text">Scholarship</span>
+                                    <span class="timeline-date">Nov 15 (35 days)</span>
+                                </div>
+                                <h6>Merit Scholarship</h6>
+                                <p class="grey-text">STEM Excellence Award application</p>
+                                <div class="timeline-status">
+                                    <div class="status-badge completed">
+                                        <i class="material-icons tiny">check_circle</i>
+                                        Draft Ready
+                                    </div>
+                                    <button class="btn-floating btn-small waves-effect waves-light green">
+                                        <i class="material-icons">edit</i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="#" class="btn-flat waves-effect">View All</a>
+                    <a href="#modal-add-deadline" class="btn waves-effect waves-light blue right modal-trigger">
+                        <i class="material-icons left">add</i>
+                        Add Deadline
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deadline Filter Dropdown -->
+        <ul id="deadline-filter" class="dropdown-content">
+            <li><a href="#!">All Deadlines</a></li>
+            <li><a href="#!">This Week</a></li>
+            <li><a href="#!">This Month</a></li>
+            <li class="divider"></li>
+            <li><a href="#!">Early Action</a></li>
+            <li><a href="#!">Regular Decision</a></li>
+            <li><a href="#!">Test Dates</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize carousel
+    var carouselElems = document.querySelectorAll('.carousel');
+    var carouselInstances = M.Carousel.init(carouselElems, {
+        fullWidth: true,
+        indicators: true,
+        duration: 300,
+        dist: 0,
+        padding: 0,
+        noWrap: false,
+        numVisible: 5
+    });
+
+    // Auto-slide the carousel
+    if (carouselInstances.length > 0) {
+        setInterval(function() {
+            carouselInstances[0].next();
+        }, 5000);
+    }
+
+    // Initialize dropdowns
+    var dropdownElems = document.querySelectorAll('.dropdown-trigger');
+    var dropdownInstances = M.Dropdown.init(dropdownElems, {
+        coverTrigger: false,
+        constrainWidth: false
+    });
+
+    // Initialize tooltips
+    var tooltipElems = document.querySelectorAll('.tooltipped');
+    var tooltipInstances = M.Tooltip.init(tooltipElems);
+
+    // Initialize modals
+    var modalElems = document.querySelectorAll('.modal');
+    var modalInstances = M.Modal.init(modalElems);
+});
+</script>
+{% endblock %}

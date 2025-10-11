@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="50" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 10 h40 l-20 15 Z" fill="#1565C0"/>
+    <path d="M20 25 h60 v5 h-60 Z" fill="#1565C0"/>
+    <text x="50" y="45" font-family="Arial" font-size="10" fill="#1565C0" text-anchor="middle">STANFORD</text>
+</svg>

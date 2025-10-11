@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MCB{% endblock %}</title>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    {% if request.endpoint == 'dashboard' %}
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#" data-target="dashboard-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <div class="container">
+                <div class="nav-content">
+                    <div class="left">
+                        <span class="page-title">Dashboard</span>
+                    </div>
+                    <ul class="nav-actions">
+                        <li>
+                            <a href="#" class="tooltipped" data-position="bottom" data-tooltip="Search">
+                                <i class="material-icons">search</i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="tooltipped" data-position="bottom" data-tooltip="Notifications">
+                                <i class="material-icons">notifications</i>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-trigger" href="#!" data-target="profile-dropdown">
+                                <i class="material-icons">account_circle</i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Profile Dropdown -->
+    <ul id="profile-dropdown" class="dropdown-content profile-dropdown">
+        <li><a href="/profile"><i class="material-icons">person</i>Profile</a></li>
+        <li><a href="/settings"><i class="material-icons">settings</i>Settings</a></li>
+        <li class="divider"></li>
+        <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
+    </ul>
+
+    <!-- Dashboard Sidenav -->
+    <ul class="sidenav sidenav-fixed dashboard-nav" id="dashboard-nav">
+        <li class="user-view">
+            <a href="#user"><img class="circle" src="https://via.placeholder.com/64" alt="User"></a>
+            <a href="#name"><span class="white-text name">John Doe</span></a>
+            <a href="#email"><span class="white-text email">john@example.com</span></a>
+        </li>
+        
+        <li class="active"><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
+        
+        <li><div class="divider"></div></li>
+        <li><div class="subheader">Applications</div></li>
+        <li><a href="/applications"><i class="material-icons">description</i>My Applications</a></li>
+        <li><a href="/schools"><i class="material-icons">school</i>Schools</a></li>
+        <li><a href="/deadlines"><i class="material-icons">event</i>Deadlines</a></li>
+        
+        <li><div class="divider"></div></li>
+        <li><div class="subheader">Resources</div></li>
+        <li><a href="/mentor"><i class="material-icons">smart_toy</i>AI Mentor</a></li>
+        <li><a href="/essays"><i class="material-icons">edit</i>Essays</a></li>
+        <li><a href="/documents"><i class="material-icons">folder</i>Documents</a></li>
+    </ul>
+    {% else %}
+    <nav class="blue darken-2">
+        <div class="nav-wrapper container">
+            <a href="/" class="brand-logo">MCB</a>
+            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                {% if request.endpoint not in ['login', 'home'] %}
+                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/applications">Applications</a></li>
+                    <li><a href="/mentor">AI Mentor</a></li>
+                    <li><a href="/resources">Resources</a></li>
+                    <li>
+                        <a class="dropdown-trigger" href="#!" data-target="profile-dropdown">
+                            <i class="material-icons left">person</i>Profile<i class="material-icons right">arrow_drop_down</i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li><a href="/career-options">Career Options</a></li>
+                    <li><a href="/login" class="waves-effect waves-light btn">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        {% if request.endpoint not in ['login', 'home'] %}
+            <li><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
+            <li><a href="/applications"><i class="material-icons">description</i>Applications</a></li>
+            <li><a href="/mentor"><i class="material-icons">smart_toy</i>AI Mentor</a></li>
+            <li><a href="/resources"><i class="material-icons">library_books</i>Resources</a></li>
+            <li><a href="/profile"><i class="material-icons">person</i>Profile</a></li>
+            <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
+        {% else %}
+            <li><a href="/career-options"><i class="material-icons">work</i>Career Options</a></li>
+            <li><a href="/login"><i class="material-icons">login</i>Login</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+
+    <!-- Profile Dropdown Structure -->
+    <ul id="profile-dropdown" class="dropdown-content">
+        <li><a href="/profile"><i class="material-icons">person</i>My Profile</a></li>
+        <li><a href="/settings"><i class="material-icons">settings</i>Settings</a></li>
+        <li class="divider"></li>
+        <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
+    </ul>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="container">
+                    <div class="card-panel {{ 'green' if category == 'success' else 'red' }} lighten-4">
+                        {{ message }}
+                        <button class="btn-flat toast-action right">Close</button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer blue darken-2">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">MCB</h5>
+                    <p class="grey-text text-lighten-4">Your AI-powered career companion.</p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="#!">About Us</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Contact</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Privacy Policy</a></li>
+                        <li><a class="grey-text text-lighten-3" href="#!">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 MCB
+                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery (required for Materialize) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Materialize JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Initialize Materialize components -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're on the dashboard
+            const isDashboard = window.location.pathname === '/dashboard';
+            if (isDashboard) {
+                document.body.classList.add('dashboard-layout');
+            }
+
+            // Initialize sidenav
+            var sidenavElems = document.querySelectorAll('.sidenav');
+            var sidenavInstances = M.Sidenav.init(sidenavElems, {
+                edge: 'left',
+                draggable: true,
+                preventScrolling: true
+            });
+
+            // For dashboard nav, ensure it stays open on large screens
+            const dashboardNav = document.querySelector('.dashboard-nav');
+            if (dashboardNav && window.innerWidth > 992) {
+                M.Sidenav.getInstance(dashboardNav).open();
+            }
+
+            // Handle window resize for dashboard nav
+            window.addEventListener('resize', function() {
+                const dashboardNav = document.querySelector('.dashboard-nav');
+                if (dashboardNav) {
+                    const instance = M.Sidenav.getInstance(dashboardNav);
+                    if (window.innerWidth > 992) {
+                        instance.open();
+                    } else {
+                        instance.close();
+                    }
+                }
+            });
+
+            // Initialize dropdowns
+            var dropdownElems = document.querySelectorAll('.dropdown-trigger');
+            var dropdownInstances = M.Dropdown.init(dropdownElems, {
+                coverTrigger: false,
+                constrainWidth: false,
+                alignment: 'right'
+            });
+
+            // Initialize tooltips
+            var tooltipElems = document.querySelectorAll('.tooltipped');
+            var tooltipInstances = M.Tooltip.init(tooltipElems);
+
+            // Initialize toast close buttons
+            var toastCloseButtons = document.querySelectorAll('.toast-action');
+            toastCloseButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    this.closest('.card-panel').remove();
+                });
+            });
+
+            // Handle active menu items
+            if (isDashboard) {
+                const currentPath = window.location.pathname;
+                document.querySelectorAll('#dashboard-nav li a').forEach(link => {
+                    if (link.getAttribute('href') === currentPath) {
+                        link.parentElement.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

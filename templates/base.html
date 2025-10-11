@@ -21,7 +21,7 @@
             <div class="container">
                 <div class="nav-content">
                     <div class="left">
-                        <span class="page-title">Dashboard</span>
+                        <!-- Empty left section -->
                     </div>
                     <ul class="nav-actions">
                         <li>
@@ -61,7 +61,7 @@
             <a href="#email"><span class="white-text email">john@example.com</span></a>
         </li>
         
-        <li class="active"><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
+        <li class="active"><a href="/dashboard"><i class="material-icons">home</i>Home</a></li>
         
         <li><div class="divider"></div></li>
         <li><div class="subheader">Applications</div></li>
@@ -82,7 +82,7 @@
             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 {% if request.endpoint not in ['login', 'home'] %}
-                    <li><a href="/dashboard">Dashboard</a></li>
+                    <li><a href="/dashboard">Home</a></li>
                     <li><a href="/applications">Applications</a></li>
                     <li><a href="/mentor">AI Mentor</a></li>
                     <li><a href="/resources">Resources</a></li>
@@ -92,8 +92,11 @@
                         </a>
                     </li>
                 {% else %}
-                    <li><a href="/career-options">Career Options</a></li>
-                    <li><a href="/login" class="waves-effect waves-light btn">Login</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#impact">Impact</a></li>
+                    <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="#cta">Get Started</a></li>
+                    <li><a href="/login" class="waves-effect waves-light btn white blue-text">Login</a></li>
                 {% endif %}
             </ul>
         </div>
@@ -102,14 +105,17 @@
     <!-- Mobile Navigation -->
     <ul class="sidenav" id="mobile-nav">
         {% if request.endpoint not in ['login', 'home'] %}
-            <li><a href="/dashboard"><i class="material-icons">dashboard</i>Dashboard</a></li>
+            <li><a href="/dashboard"><i class="material-icons">home</i>Home</a></li>
             <li><a href="/applications"><i class="material-icons">description</i>Applications</a></li>
             <li><a href="/mentor"><i class="material-icons">smart_toy</i>AI Mentor</a></li>
             <li><a href="/resources"><i class="material-icons">library_books</i>Resources</a></li>
             <li><a href="/profile"><i class="material-icons">person</i>Profile</a></li>
             <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
         {% else %}
-            <li><a href="/career-options"><i class="material-icons">work</i>Career Options</a></li>
+            <li><a href="#features"><i class="material-icons">star</i>Features</a></li>
+            <li><a href="#impact"><i class="material-icons">trending_up</i>Impact</a></li>
+            <li><a href="#testimonials"><i class="material-icons">format_quote</i>Testimonials</a></li>
+            <li><a href="#cta"><i class="material-icons">rocket_launch</i>Get Started</a></li>
             <li><a href="/login"><i class="material-icons">login</i>Login</a></li>
         {% endif %}
     </ul>

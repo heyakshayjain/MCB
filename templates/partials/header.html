@@ -1,0 +1,49 @@
+<!-- Main Site Header -->
+<nav class="transparent z-depth-0">
+  <div class="nav-wrapper container">
+    <a href="/" class="brand-logo">MCB</a>
+    <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+    <ul class="right hide-on-med-and-down">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#testimonials">Testimonials</a></li>
+      <li><a href="#cta">Pricing</a></li>
+      {% if session.get('user') %}
+      <li>
+        <a class="dropdown-trigger" href="#" data-target="profile-menu">
+          <img src="{{ session['user'].get('picture') or url_for('static', filename='images/avatar_placeholder.png') }}" alt="avatar" style="width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-right:8px;">
+          {{ session['user'].get('name') or session['user'].get('email') }}
+          <i class="material-icons right" style="margin-left:6px;">expand_more</i>
+        </a>
+        <ul id="profile-menu" class="dropdown-content profile-dropdown">
+          <li><a href="{{ url_for('dashboard') }}"><i class="material-icons">dashboard</i>Dashboard</a></li>
+          <li><a href="{{ url_for('account') }}"><i class="material-icons">account_circle</i>Account</a></li>
+          <li class="divider" tabindex="-1"></li>
+          <li><a href="{{ url_for('logout') }}"><i class="material-icons">logout</i>Logout</a></li>
+        </ul>
+      </li>
+      {% else %}
+      <li>
+        <a href="{{ url_for('login') }}" class="btn white blue-text waves-effect waves-light">
+          <i class="material-icons left">login</i>Login
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+
+<!-- Mobile Nav -->
+<ul class="sidenav" id="mobile-nav">
+  <li><a href="#features">Features</a></li>
+  <li><a href="#impact">Impact</a></li>
+  <li><a href="#testimonials">Testimonials</a></li>
+  <li><a href="#cta">Pricing</a></li>
+  {% if session.get('user') %}
+    <li><a href="{{ url_for('dashboard') }}" class="waves-effect"><i class="material-icons left">dashboard</i>Dashboard</a></li>
+    <li><a href="{{ url_for('account') }}" class="waves-effect"><i class="material-icons left">account_circle</i>Account</a></li>
+    <li><a href="{{ url_for('logout') }}" class="waves-effect"><i class="material-icons left">logout</i>Logout</a></li>
+  {% else %}
+    <li><a href="{{ url_for('login') }}" class="waves-effect"><i class="material-icons left">login</i>Login</a></li>
+  {% endif %}
+</ul>

@@ -5,9 +5,55 @@ body {
     flex-direction: column;
 }
 
+/* =============== Dashboard layout (sidebar only) =============== */
+.layout-dashboard {
+    background: #fafbff;
+}
+
+.sidebar,
+.sidenav, /* if Materialize sidenav is used for the sidebar */
+#dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;           /* consistent width */
+    height: 100vh;
+    border-right: 1px solid #e9eef5;
+    background: #ffffff;     /* white sidebar */
+    color: #424242;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.dashboard-main {
+    margin-left: 250px;     /* match sidebar width */
+    padding: 16px;
+    min-height: 100vh;
+}
+
+@media (max-width: 992px) {
+  .sidebar,
+  .sidenav,
+  #dashboard-sidebar {
+    position: fixed;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+  }
+  .sidebar.is-open,
+  .sidenav.is-open,
+  #dashboard-sidebar.is-open {
+    transform: translateX(0);
+  }
+    .dashboard-main {
+        margin-left: 0;       /* content full-width on mobile */
+        padding: 16px;
+    }
+}
+
 /* Dashboard Layout */
+/* Remove body padding-left to avoid double spacing next to fixed sidebar */
 body.dashboard-layout {
-    padding-left: 250px;
+    padding-left: 0;
 }
 
 body.dashboard-layout nav {
@@ -766,142 +812,111 @@ section {
 }
 /* KPI Cards */
 .kpi-card {
-    border-radius: 12px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
-    height: 180px !important;
-    overflow: hidden;
-}
-
-.kpi-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
-}
-
-.kpi-card .card-content {
-    padding: 1.25rem !important;
     position: relative;
-    overflow: hidden;
-    height: 100%;
+    border-radius: 16px;
+    padding: 0;                    /* let inner content control padding */
+    background: transparent;       /* remove white card background */
+    box-shadow: none;              /* move shadow to the colored panel */
+}
+
+/* Normalize inner layout and height */
+.kpi-card .card-content {
+    min-height: 300px;             /* equal visual height across KPIs */
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    border-radius: 16px;           /* colored panel corners */
+    padding: 20px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.12);
+}
+
+.kpi-card .kpi-title {
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  letter-spacing: .2px;
+  line-height: 1.35;
+  margin: 0 0 8px;
+  text-wrap: balance;
+}
+
+.kpi-card .kpi-value {
+  font-size: clamp(28px, 4.2vw, 36px);
+  font-weight: 800;
+  line-height: 1;
+  margin: 6px 0;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+    white-space: normal; /* allow wrapping on smaller widths */
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    box-sizing: border-box;
+}
+
+.kpi-card .kpi-trend {
+    font-size: 0.95rem !important;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 2px 8px;
+    border-radius: 12px;
 }
 
 .kpi-card .card-title {
-    font-size: 0.85rem !important;
-    font-weight: 500 !important;
-    margin-bottom: 0.75rem !important;
-    opacity: 0.9;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
-.kpi-value {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin: 0.5rem 0;
-    flex-grow: 1;
-    min-height: 0;
+.kpi-card .kpi-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.95;
 }
 
-.kpi-main {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    flex: 1;
-    min-width: 0;
-}
-
-.kpi-value .number {
-    font-size: 2rem !important;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.5rem;
-    white-space: nowrap;
-}
-
-.kpi-trend {
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    padding: 0.2rem 0.4rem;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.1);
-    margin-bottom: 0.5rem;
-    white-space: nowrap;
-}
-
-.kpi-trend i {
-    font-size: 0.75rem;
-}
-
-.kpi-subtitle {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    margin-top: 0.5rem;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-}
-
-.kpi-icon {
-    position: absolute;
-    right: 0.75rem;
-    top: 0.75rem;
-    opacity: 0.15;
-    transform: rotate(-10deg);
-    flex-shrink: 0;
-}
-
-.kpi-icon i {
-    font-size: 2rem !important;
-}
-
+/* Consistent progress bar spacing inside KPIs */
 .kpi-card .progress {
-    height: 3px;
-    border-radius: 2px;
-    background-color: rgba(255,255,255,0.2);
-    margin-top: 0.5rem;
-    flex-shrink: 0;
+    height: 6px;
+    background: rgba(255,255,255,0.25);
+    margin-top: auto;               /* pin progress to the bottom */
 }
 
-.kpi-card .progress .determinate {
-    border-radius: 2px;
+.kpi-card .kpi-meta {
+  font-size: 13px;
+  opacity: .95;
+  line-height: 1.35;
+  text-wrap: pretty;
 }
 
-.progress-ring {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    margin-left: 1rem;
+/* color themes */
+.kpi--blue   { background: linear-gradient(135deg, #1e88e5, #1565c0); }
+.kpi--red    { background: linear-gradient(135deg, #ef5350, #e53935); }
+.kpi--green  { background: linear-gradient(135deg, #43a047, #2e7d32); }
+.kpi--orange { background: linear-gradient(135deg, #fb8c00, #f57c00); }
+
+/* optional decorative corner icon */
+.kpi-card::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  top: -24px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
 }
 
-.progress-ring-circle {
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
+/* Ensure text stays readable on any length */
+.kpi-title, .kpi-meta { word-break: break-word; }
+
+/* KPI Grid helper (if used on dashboard) */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
 }
 
-.progress-ring-circle-bg {
-    fill: none;
-    stroke: rgba(255,255,255,0.2);
-    stroke-width: 3;
+@media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-
-.progress-ring-circle-fg {
-    fill: none;
-    stroke: white;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-dasharray: 100;
-    transition: stroke-dashoffset 0.3s ease;
+@media (max-width: 600px) {
+    .kpi-grid { grid-template-columns: 1fr; }
 }
 
 /* News Feed */
@@ -1410,9 +1425,8 @@ section {
 .feature-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #1565C0;
     margin-bottom: 1rem;
-    line-height: 1.3;
+    color: #1565C0;
 }
 
 .feature-card p {
@@ -1780,6 +1794,8 @@ section {
 .mb-2 { margin-bottom: 2rem; }
 .p-2 { padding: 2rem; }
 
+/* Applications styles moved to applications.css */
+
 /* Responsive adjustments */
 @media only screen and (max-width: 992px) {
     .hero-title {
@@ -1909,4 +1925,41 @@ nav ul li a[href^="#"] {
 
 nav ul li a[href^="#"]:hover {
     color: #64b5f6 !important;
+}
+
+/* ===== Sidebar visual fixes (override) ===== */
+/* Keep items on white, avoid color block behind 'Home' */
+.sidenav.dashboard-nav {
+    background-color: #ffffff !important;
+}
+
+.sidenav .user-view {
+    margin-bottom: 8px !important;
+    background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%) !important;
+}
+
+/* Separator under the profile header */
+.sidenav .user-view + li {
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Active item: show accent border, not filled background */
+.sidenav li.active > a {
+    background-color: transparent !important;
+    border-right: 3px solid #1976d2;
+    color: #1976d2 !important;
+}
+
+.sidenav li.active > a i.material-icons {
+    color: #1976d2 !important;
+}
+
+/* Hover stays subtle on white */
+.sidenav li > a:hover {
+    background-color: #f7f9fc !important;
+}
+
+/* Also remove any background on the active list item container */
+.sidenav li.active {
+    background-color: transparent !important;
 }

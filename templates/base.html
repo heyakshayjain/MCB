@@ -8,172 +8,31 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Materialize CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <!-- Custom CSS -->
+    <!-- Global/Landing CSS (legacy + new path during migration) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/landing/landing.css') }}">
+    <!-- Modular CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard/applications.css') }}">
     {% block head %}{% endblock %}
 </head>
-<body>
-    <!-- Navbar -->
-    {% if request.endpoint == 'dashboard' %}
-    <nav>
-        <div class="nav-wrapper">
-            <a href="#" data-target="dashboard-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-            <div class="container">
-                <div class="nav-content">
-                    <div class="left">
-                        <!-- Empty left section -->
-                    </div>
-                    <ul class="nav-actions">
-                        <li>
-                            <a href="#" class="tooltipped" data-position="bottom" data-tooltip="Search">
-                                <i class="material-icons">search</i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="tooltipped" data-position="bottom" data-tooltip="Notifications">
-                                <i class="material-icons">notifications</i>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-trigger" href="#!" data-target="profile-dropdown">
-                                <i class="material-icons">account_circle</i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </nav>
+<body class="{% if session.get('user') and request.endpoint not in ['home','login'] %}layout-dashboard{% endif %}">
+    {# Global layout: show sidebar for any authenticated app pages (dashboard, applications, etc.) #}
+    {% set use_sidebar = session.get('user') and request.endpoint not in ['home','login'] %}
 
-    <!-- Profile Dropdown -->
-    <ul id="profile-dropdown" class="dropdown-content profile-dropdown">
-        <li><a href="/profile"><i class="material-icons">person</i>Profile</a></li>
-        <li><a href="/settings"><i class="material-icons">settings</i>Settings</a></li>
-        <li class="divider"></li>
-        <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
-    </ul>
-
-    <!-- Dashboard Sidenav -->
-    <ul class="sidenav sidenav-fixed dashboard-nav" id="dashboard-nav">
-        <li class="user-view">
-            <a href="#user"><img class="circle" src="https://via.placeholder.com/64" alt="User"></a>
-            <a href="#name"><span class="white-text name">John Doe</span></a>
-            <a href="#email"><span class="white-text email">john@example.com</span></a>
-        </li>
-        
-        <li class="active"><a href="/dashboard"><i class="material-icons">home</i>Home</a></li>
-        
-        <li><div class="divider"></div></li>
-        <li><div class="subheader">Applications</div></li>
-        <li><a href="/applications"><i class="material-icons">description</i>My Applications</a></li>
-        <li><a href="/schools"><i class="material-icons">school</i>Schools</a></li>
-        <li><a href="/deadlines"><i class="material-icons">event</i>Deadlines</a></li>
-        
-        <li><div class="divider"></div></li>
-        <li><div class="subheader">Resources</div></li>
-        <li><a href="/mentor"><i class="material-icons">smart_toy</i>AI Mentor</a></li>
-        <li><a href="/essays"><i class="material-icons">edit</i>Essays</a></li>
-        <li><a href="/documents"><i class="material-icons">folder</i>Documents</a></li>
-    </ul>
+    {% if not use_sidebar %}
+        {% include 'partials/header.html' %}
     {% else %}
-    <nav class="blue darken-2">
-        <div class="nav-wrapper container">
-            <a href="/" class="brand-logo">MCB</a>
-            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-            <ul id="nav-mobile" class="right hide-on-med-and-down">
-                {% if request.endpoint not in ['login', 'home'] %}
-                    <li><a href="/dashboard">Home</a></li>
-                    <li><a href="/applications">Applications</a></li>
-                    <li><a href="/mentor">AI Mentor</a></li>
-                    <li><a href="/resources">Resources</a></li>
-                    <li>
-                        <a class="dropdown-trigger" href="#!" data-target="profile-dropdown">
-                            <i class="material-icons left">person</i>Profile<i class="material-icons right">arrow_drop_down</i>
-                        </a>
-                    </li>
-                {% else %}
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#impact">Impact</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
-                    <li><a href="#cta">Get Started</a></li>
-                    <li><a href="/login" class="waves-effect waves-light btn white blue-text">Login</a></li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Mobile Navigation -->
-    <ul class="sidenav" id="mobile-nav">
-        {% if request.endpoint not in ['login', 'home'] %}
-            <li><a href="/dashboard"><i class="material-icons">home</i>Home</a></li>
-            <li><a href="/applications"><i class="material-icons">description</i>Applications</a></li>
-            <li><a href="/mentor"><i class="material-icons">smart_toy</i>AI Mentor</a></li>
-            <li><a href="/resources"><i class="material-icons">library_books</i>Resources</a></li>
-            <li><a href="/profile"><i class="material-icons">person</i>Profile</a></li>
-            <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
-        {% else %}
-            <li><a href="#features"><i class="material-icons">star</i>Features</a></li>
-            <li><a href="#impact"><i class="material-icons">trending_up</i>Impact</a></li>
-            <li><a href="#testimonials"><i class="material-icons">format_quote</i>Testimonials</a></li>
-            <li><a href="#cta"><i class="material-icons">rocket_launch</i>Get Started</a></li>
-            <li><a href="/login"><i class="material-icons">login</i>Login</a></li>
-        {% endif %}
-    </ul>
+        {% include 'partials/sidebar.html' %}
     {% endif %}
 
-    <!-- Profile Dropdown Structure -->
-    <ul id="profile-dropdown" class="dropdown-content">
-        <li><a href="/profile"><i class="material-icons">person</i>My Profile</a></li>
-        <li><a href="/settings"><i class="material-icons">settings</i>Settings</a></li>
-        <li class="divider"></li>
-        <li><a href="/logout"><i class="material-icons">exit_to_app</i>Logout</a></li>
-    </ul>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="container">
-                    <div class="card-panel {{ 'green' if category == 'success' else 'red' }} lighten-4">
-                        {{ message }}
-                        <button class="btn-flat toast-action right">Close</button>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <!-- Main Content -->
-    <main>
+    <main id="{{ 'dashboard-main' if use_sidebar else 'page-main' }}" class="{{ 'dashboard-main' if use_sidebar else 'page-main' }}">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="page-footer blue darken-2">
-        <div class="container">
-            <div class="row">
-                <div class="col l6 s12">
-                    <h5 class="white-text">MCB</h5>
-                    <p class="grey-text text-lighten-4">Your AI-powered career companion.</p>
-                </div>
-                <div class="col l4 offset-l2 s12">
-                    <h5 class="white-text">Links</h5>
-                    <ul>
-                        <li><a class="grey-text text-lighten-3" href="#!">About Us</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Contact</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Privacy Policy</a></li>
-                        <li><a class="grey-text text-lighten-3" href="#!">Terms of Service</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                © 2025 MCB
-                <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
-            </div>
-        </div>
-    </footer>
+    {% if not use_sidebar %}
+        {% include 'partials/footer.html' %}
+    {% endif %}
 
     <!-- jQuery (required for Materialize) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

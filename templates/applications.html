@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}My Applications - MCB{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <!-- Header row -->
+    <div class="row" style="align-items:center; gap:8px;">
+      <div class="col s12 l6">
+        <h4 class="page-title" style="margin:0; display:flex; align-items:center; gap:12px;">
+          <i class="material-icons">folder_open</i>
+          My Applications
+        </h4>
+        <p class="grey-text" style="margin:.25rem 0 0;">{{ apps|length }} total • Track colleges, exams and more</p>
+      </div>
+      <div class="col s12 l6" style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+        <a href="#modal-add-app" class="btn waves-effect waves-light blue modal-trigger"><i class="material-icons left">add</i>Add New Application</a>
+        <a class="btn-flat waves-effect"><i class="material-icons left">file_download</i>Export</a>
+        <a id="toggle-view" class="btn-flat waves-effect" data-view="grid"><i class="material-icons left">view_module</i>Grid</a>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="row">
+      <div class="col s12">
+        <ul class="tabs tabs-fixed-width">
+          <li class="tab"><a class="active" href="#tab-all">All Applications</a></li>
+          <li class="tab"><a href="#tab-colleges">Colleges <span class="new badge" data-badge-caption="">{{ apps|selectattr('type','ne','Test Registration')|list|length }}</span></a></li>
+          <li class="tab"><a href="#tab-exams">Exams <span class="new badge" data-badge-caption="">{{ apps|selectattr('type','equalto','Test Registration')|list|length }}</span></a></li>
+          <li class="tab"><a href="#tab-progress">In Progress</a></li>
+          <li class="tab"><a href="#tab-submitted">Submitted</a></li>
+          <li class="tab"><a href="#tab-results">Accepted/Rejected</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Controls: search + sort -->
+    <div class="row" style="align-items:center;">
+      <div class="col s12 l8">
+        <div class="input-field" style="margin-top:0;">
+          <i class="material-icons prefix">search</i>
+          <input id="search" type="text" placeholder="Search applications by name">
+        </div>
+      </div>
+      <div class="col s12 l4" style="display:flex; gap:8px; justify-content:flex-end;">
+        <a class="dropdown-trigger btn-flat" href="#" data-target="sort-menu">Sort: <span id="sort-label">By Deadline</span> <i class="material-icons right">arrow_drop_down</i></a>
+      </div>
+    </div>
+    <ul id="sort-menu" class="dropdown-content">
+      <li><a href="#" data-sort="deadline">By Deadline</a></li>
+      <li><a href="#" data-sort="status">By Status</a></li>
+      <li><a href="#" data-sort="name">By Name</a></li>
+      <li><a href="#" data-sort="recent">Recently Added</a></li>
+    </ul>
+
+    <!-- Applications content -->
+    <div id="tab-all" class="col s12">
+      <div id="apps-grid" class="row apps-grid" style="margin-top:8px;">
+        {% for a in apps %}
+        <div class="col s12 m6 l4 xl3 app-item" data-name="{{ a.name }}" data-status="{{ a.status }}" data-deadline="{{ a.deadline }}" data-type="{{ a.type }}">
+          <div class="card app-card hoverable">
+            <div class="app-card-header">
+              <img src="{{ a.logo }}" onerror="this.src='https://via.placeholder.com/48'" alt="logo">
+              <div class="app-card-title">
+                <h6>{{ a.name }}</h6>
+                <span class="chip small {{ a.type|lower|replace(' ','-') }}">{{ a.type }}</span>
+              </div>
+              <a class="btn-flat star-btn" title="Mark priority"><i class="material-icons">star_border</i></a>
+            </div>
+            <div class="app-card-body">
+              <div class="deadline">Deadline: <strong>{{ a.deadline }}</strong></div>
+              <div class="status {{ a.status|lower|replace(' ','-') }}">{{ a.status }}</div>
+              <div class="progress" title="{{ a.docs_done }}/{{ a.docs_total }} Documents">
+                <div class="determinate" style="width: {{ (a.docs_done / a.docs_total * 100)|round(0) }}%"></div>
+              </div>
+              <div class="doc-meta grey-text">{{ a.docs_done }}/{{ a.docs_total }} Documents Uploaded</div>
+            </div>
+            <div class="card-action" style="display:flex; justify-content:space-between; align-items:center;">
+              <a href="{{ url_for('application_detail', app_id=a.id) }}" class="btn-small waves-effect blue">{% if a.status in ['Draft','In Progress'] %}Continue{% else %}View Details{% endif %}</a>
+              <a class="btn-flat dropdown-trigger" href="#" data-target="menu-{{ a.id }}"><i class="material-icons">more_vert</i></a>
+            </div>
+          </div>
+        </div>
+        <ul id="menu-{{ a.id }}" class="dropdown-content">
+          <li><a href="#">Edit</a></li>
+          <li><a href="#">Duplicate</a></li>
+          <li class="divider"></li>
+          <li><a href="#" class="red-text">Delete</a></li>
+          <li><a href="#">Move to Archive</a></li>
+        </ul>
+        {% endfor %}
+      </div>
+
+      <!-- List view -->
+      <ul id="apps-list" class="collection apps-list" style="display:none;">
+        {% for a in apps %}
+        <li class="collection-item avatar app-item" data-name="{{ a.name }}" data-status="{{ a.status }}" data-deadline="{{ a.deadline }}" data-type="{{ a.type }}">
+          <img src="{{ a.logo }}" onerror="this.src='https://via.placeholder.com/48'" alt="" class="circle">
+          <span class="title">{{ a.name }}</span>
+          <p>
+            <span class="chip small">{{ a.type }}</span>
+            <span class="status {{ a.status|lower|replace(' ','-') }}">{{ a.status }}</span>
+            <span class="grey-text">Deadline: {{ a.deadline }}</span>
+          </p>
+          <a href="{{ url_for('application_detail', app_id=a.id) }}" class="secondary-content btn-flat waves-effect"><i class="material-icons">chevron_right</i></a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Other tabs just reuse the same containers filtered via JS -->
+    <div id="tab-colleges" class="col s12"></div>
+    <div id="tab-exams" class="col s12"></div>
+    <div id="tab-progress" class="col s12"></div>
+    <div id="tab-submitted" class="col s12"></div>
+    <div id="tab-results" class="col s12"></div>
+  </div>
+</section>
+
+<!-- Add New Application Modal (skeleton) -->
+<div id="modal-add-app" class="modal">
+  <div class="modal-content">
+    <h5>Add New Application</h5>
+    <div class="row">
+      <div class="col s12">
+        <div class="chips">Type: College Application / Test / Scholarship</div>
+      </div>
+      <div class="input-field col s12 m6">
+        <input id="inst" type="text" placeholder="Institution name">
+        <label for="inst" class="active">Institution</label>
+      </div>
+      <div class="input-field col s12 m6">
+        <input id="program" type="text" placeholder="Computer Science">
+        <label for="program" class="active">Program/Major</label>
+      </div>
+      <div class="input-field col s12 m6">
+        <select>
+          <option value="EA">Early Action</option>
+          <option value="ED">Early Decision</option>
+          <option value="RD" selected>Regular Decision</option>
+          <option value="Rolling">Rolling</option>
+        </select>
+        <label>Application Round</label>
+      </div>
+      <div class="input-field col s12 m6">
+        <input type="text" class="datepicker" id="deadlinePicker">
+        <label for="deadlinePicker">Deadline</label>
+      </div>
+      <div class="input-field col s12">
+        <textarea id="notes" class="materialize-textarea" placeholder="Notes"></textarea>
+        <label for="notes" class="active">Notes</label>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="modal-close btn-flat">Cancel</a>
+    <a class="modal-close btn grey">Save Draft</a>
+    <a class="modal-close btn blue">Create Application</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {coverTrigger:false, constrainWidth:false});
+    M.Tabs.init(document.querySelectorAll('.tabs'));
+    M.Datepicker.init(document.querySelectorAll('.datepicker'));
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.Modal.init(document.querySelectorAll('.modal'));
+
+    const toggleBtn = document.getElementById('toggle-view');
+    const grid = document.getElementById('apps-grid');
+    const list = document.getElementById('apps-list');
+    toggleBtn.addEventListener('click', () => {
+      const toList = toggleBtn.dataset.view === 'grid';
+      grid.style.display = toList ? 'none' : '';
+      list.style.display = toList ? '' : 'none';
+      toggleBtn.dataset.view = toList ? 'list' : 'grid';
+      toggleBtn.innerHTML = toList ? '<i class="material-icons left">view_list</i>List' : '<i class="material-icons left">view_module</i>Grid';
+    });
+
+    // Simple search filter
+    const search = document.getElementById('search');
+    search.addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.app-item').forEach(el => {
+        el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  });
+</script>
+{% endblock %}

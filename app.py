@@ -282,7 +282,8 @@ def api_mentor():
 
 if __name__ == '__main__':
     try:
-        # Use port 8000 for Flask backend API - bind to all interfaces for Docker
-        app.run(debug=True, host='0.0.0.0', port=8000)
+        # Use PORT environment variable for Railway, default to 8000 for local development
+        port = int(os.getenv('PORT', 8000))
+        app.run(debug=True, host='0.0.0.0', port=port)
     except Exception as e:
         print(f"Error starting Flask server: {e}")

@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, render_template
+from flask import Flask, request, redirect, url_for, session, flash, jsonify, render_template, send_from_directory
 from flask_compress import Compress
 from functools import wraps
 from authlib.integrations.flask_client import OAuth
@@ -41,8 +41,8 @@ Compress(app)  # Enable compression for better performance
 
 # CORS configuration for React frontend
 from flask_cors import CORS
-# For production, update this with your Railway domain
-CORS(app, origins=['http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
+# Allow both localhost and production domains
+CORS(app, origins=['http://localhost:8000', 'http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
@@ -105,18 +105,18 @@ def login():
     # Return JSON for API calls, redirect to React app for web
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({"message": "Please use Google OAuth for authentication"})
-    # Redirect to appropriate login URL based on environment
-    login_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/login'
-    return redirect(login_url)
+    # For web requests, serve the React app directly instead of redirecting
+    return render_template("index.html")
 
 
 @app.route('/login/google')
 def login_google():
     if not oauth:
         return jsonify({'error': 'Google OAuth not configured'}), 500
-    # Start Google OAuth flow - redirect_uri is configured in Google Console
-    # The redirect_uri should match what's set in Google OAuth Console
-    return oauth.google.authorize_redirect('https://mcb.up.railway.app/auth/google/callback')
+    # Start Google OAuth flow - use environment-based redirect URI
+    base_url = os.getenv('FRONTEND_URL', 'http://localhost:8000')
+    redirect_uri = f"{base_url}/auth/google/callback"
+    return oauth.google.authorize_redirect(redirect_uri)
 
 
 @app.route('/auth/google/callback')
@@ -153,7 +153,7 @@ def auth_google_callback():
                 'user': session['user']
             })
         # Redirect to appropriate dashboard URL based on environment
-        dashboard_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/dashboard'
+        dashboard_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/dashboard'
         return redirect(dashboard_url)
     except Exception as e:
         logging.exception('Google authentication error')
@@ -179,11 +179,15 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/manifest.json")
+def manifest():
+    return send_from_directory(app.template_folder, "manifest.json")
+
 @app.route("/<path:path>")
 def catch_all(path):
     # Catch-all route for React Router - serve index.html for any unmatched routes
-    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account") or path.startswith("static/") or path == "manifest.json":
-        # Let Flask handle API routes, specific pages, static files, and manifest
+    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account") or path.startswith("static/"):
+        # Let Flask handle API routes, specific pages, and static files
         return "Not Found", 404
     # For all other routes, serve the React app
     return render_template("index.html")

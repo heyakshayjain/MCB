@@ -25,9 +25,8 @@ WORKDIR /app/frontend/dashboard
 # Install Node.js dependencies and build
 RUN npm ci --only=production && npm run build
 
-# Point Flask to use the React build folder directly
-ENV FLASK_STATIC_FOLDER=/app/frontend/dashboard/build/static
-ENV FLASK_TEMPLATE_FOLDER=/app/frontend/dashboard/build
+# Point Flask to use the React build folder directly (environment variables loaded from .env)
+# FLASK_STATIC_FOLDER and FLASK_TEMPLATE_FOLDER are set via environment variables
 
 # Go back to root directory
 WORKDIR /app

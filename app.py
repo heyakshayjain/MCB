@@ -39,8 +39,8 @@ Compress(app)  # Enable compression for better performance
 
 # CORS configuration for API access
 from flask_cors import CORS
-# Allow API access from various origins
-CORS(app, supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
+# Allow API access from frontend and other origins
+CORS(app, origins=['https://mcb-frontend.up.railway.app', 'http://localhost:3000', 'http://localhost:3001'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
@@ -108,7 +108,7 @@ def login_google():
     if not oauth:
         return jsonify({'error': 'Google OAuth not configured'}), 500
     # Start Google OAuth flow - use API base URL for callback
-    base_url = os.getenv('API_BASE_URL', 'http://localhost:8000')
+    base_url = os.getenv('API_BASE_URL', 'https://mcb.up.railway.app')
     redirect_uri = f"{base_url}/auth/google/callback"
     return oauth.google.authorize_redirect(redirect_uri)
 

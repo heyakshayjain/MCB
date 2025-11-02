@@ -189,7 +189,7 @@ const ApplicationAssistant: React.FC = () => {
   ];
 
   const fetchGoogleSearchResults = async (query: string) => {
-    const API_KEY = 'AIzaSyDYCuFIFHdT_sth1HrrNIb7y2LMBr04dOI';
+    const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
     const CX = '14aea43775598454f';
     const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CX}&q=${encodeURIComponent(query)}`;
 

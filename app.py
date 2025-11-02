@@ -56,21 +56,24 @@ app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
 app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
 
 if not app.config['GOOGLE_CLIENT_ID'] or not app.config['GOOGLE_CLIENT_SECRET']:
-    raise RuntimeError(
-        "Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET. "
-        "Create a .env file (use .env.example as a template) or export these variables in your shell, then restart."
-    )
+    print("WARNING: Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.")
+    # Don't raise error for deployment - allow app to start without OAuth
+    app.config['GOOGLE_CLIENT_ID'] = None
+    app.config['GOOGLE_CLIENT_SECRET'] = None
 
-oauth = OAuth(app)
-oauth.register(
-    name='google',
-    client_id=app.config['GOOGLE_CLIENT_ID'],
-    client_secret=app.config['GOOGLE_CLIENT_SECRET'],
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={
-        'scope': 'openid email profile'
-    }
-)
+# Initialize OAuth only if credentials are available
+oauth = None
+if app.config['GOOGLE_CLIENT_ID'] and app.config['GOOGLE_CLIENT_SECRET']:
+    oauth = OAuth(app)
+    oauth.register(
+        name='google',
+        client_id=app.config['GOOGLE_CLIENT_ID'],
+        client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
 
 
 def login_required(view):
@@ -105,6 +108,8 @@ def login():
 
 @app.route('/login/google')
 def login_google():
+    if not oauth:
+        return jsonify({'error': 'Google OAuth not configured'}), 500
     # Start Google OAuth flow - redirect_uri is configured in Google Console
     # The redirect_uri should match what's set in Google OAuth Console
     return oauth.google.authorize_redirect('http://localhost:8000/auth/google/callback')

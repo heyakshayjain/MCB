@@ -39,7 +39,8 @@ Compress(app)  # Enable compression for better performance
 
 # CORS configuration for React frontend
 from flask_cors import CORS
-CORS(app, origins=['http://localhost:3001'], supports_credentials=True, allow_headers=['Content-Type'])
+# For production, update this with your Railway domain
+CORS(app, origins=['http://localhost:3001', 'https://your-app-name.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')

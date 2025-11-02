@@ -170,6 +170,16 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/<path:path>")
+def catch_all(path):
+    # Catch-all route for React Router - serve index.html for any unmatched routes
+    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account"):
+        # Let Flask handle API routes and specific pages
+        return "Not Found", 404
+    # For all other routes, serve the React app
+    return render_template("index.html")
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():

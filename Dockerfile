@@ -6,8 +6,6 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    nodejs \
-    npm \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,19 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy Flask app
 COPY app.py .
-
-# Copy React frontend
-COPY frontend/dashboard/ ./frontend/dashboard/
-WORKDIR /app/frontend/dashboard
-
-# Install Node.js dependencies and build
-RUN npm ci --only=production && npm run build
-
-# Point Flask to use the React build folder directly (environment variables loaded from .env)
-# FLASK_STATIC_FOLDER and FLASK_TEMPLATE_FOLDER are set via environment variables
-
-# Go back to root directory
-WORKDIR /app
 
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash app \
@@ -44,4 +29,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/ || exit 1
 
 # Start the application
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--timeout", "120"]

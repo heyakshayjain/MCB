@@ -1,26 +1,11 @@
 [phases.setup]
-nixPkgs = ["nodejs", "python3", "python3Packages.pip", "python3Packages.virtualenv"]
+nixPkgs = ["python311", "python311Packages.pip", "python311Packages.virtualenv"]
 
 [phases.install]
 cmds = [
-    "python3 -m venv /opt/venv",
-    "source /opt/venv/bin/activate && pip install -r requirements.txt",
-    "cd frontend/dashboard && npm install"
+    "python3.11 -m venv /opt/venv",
+    "source /opt/venv/bin/activate && pip install -r requirements.txt"
 ]
-
-[phases.build]
-cmds = [
-    "cd frontend/dashboard && npm run build",
-    "rm -rf static/*",
-    "cp -r frontend/dashboard/build/* static/",
-    "cp static/index.html templates/index.html",
-    "ls -la static/static/js/ | head -10",
-    "ls -la static/static/css/ | head -10"
-]
-
-[phases.build.env]
-REACT_APP_API_BASE_URL = "https://mcb.up.railway.app"
-REACT_APP_GOOGLE_API_KEY = "your_production_google_api_key_here"
 
 [start]
-cmd = "source /opt/venv/bin/activate && gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "source /opt/venv/bin/activate && gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120"

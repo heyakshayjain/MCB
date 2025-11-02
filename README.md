@@ -1,31 +1,29 @@
-# MCB - College Application Assistant
+# MCB - College Application Assistant API
 
-A full-stack web application for managing college applications with Google OAuth authentication, built with React frontend and Flask backend.
+A REST API for managing college applications with Google OAuth authentication.
 
 ## Features
 
-- 🔐 Google OAuth authentication
-- 📊 Application tracking dashboard
+- 🔐 Google OAuth 2.0 authentication
+- 📊 Application tracking and management
 - 🎯 Step-by-step application guidance
-- 🌐 Integrated browser for application forms
-- 📱 Responsive design
+- 🌐 Integrated browser automation for forms
 - 🔍 Google Custom Search integration
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript, Tailwind CSS
-- **Backend**: Flask, Python 3.11
+- **Framework**: Flask, Python 3.11
 - **Database**: SQLite (development) / PostgreSQL (production)
 - **Authentication**: Google OAuth 2.0
 - **Deployment**: Docker, Railway
 
-## Quick Start with Docker
+## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose installed
-- Google OAuth credentials
+- Python 3.11+
+- Google OAuth credentials (Client ID & Secret)
 
-### Setup
+### Installation
 
 1. **Clone the repository**
    ```bash
@@ -33,124 +31,325 @@ A full-stack web application for managing college applications with Google OAuth
    cd MCB
    ```
 
-2. **Create environment file**
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment**
    ```bash
    cp .env.example .env
    ```
 
-   Edit `.env` with your configuration:
+   Edit `.env`:
    ```env
    SECRET_KEY=your-secret-key-here
    GOOGLE_CLIENT_ID=your-google-client-id
    GOOGLE_CLIENT_SECRET=your-google-client-secret
-   FRONTEND_URL=http://localhost:8000
    ```
 
-3. **Build and run with Docker Compose**
+4. **Run the API**
    ```bash
-   docker-compose up --build
+   python app.py
    ```
 
-4. **Access the application**
-   - Open http://localhost:8000 in your browser
+The API will be available at `http://localhost:8000`
 
-## Manual Development Setup
+## API Endpoints
 
-### Backend Setup
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
+### Authentication
 
-# Run Flask backend
-python app.py
+#### GET /
+Returns API information and version.
+
+**Response:**
+```json
+{
+  "message": "MCB College Application Assistant API",
+  "version": "1.0.0"
+}
 ```
 
-### Frontend Setup
-```bash
-# Install Node.js dependencies
-cd frontend/dashboard
-npm install
+#### GET /login
+Check current authentication status.
 
-# Start React development server
-npm start
+**Response (authenticated):**
+```json
+{
+  "user": {
+    "email": "user@example.com",
+    "name": "User Name",
+    "picture": "https://...",
+    "provider": "google",
+    "premium": true
+  }
+}
+```
+
+**Response (not authenticated):**
+```json
+{
+  "message": "Please use Google OAuth for authentication"
+}
+```
+
+#### GET /login/google
+Initiate Google OAuth login flow.
+
+**Redirects to:** Google OAuth authorization URL
+
+#### GET /auth/google/callback
+Handle Google OAuth callback.
+
+**Response (success):**
+```json
+{
+  "message": "Authentication successful",
+  "user": {
+    "email": "user@example.com",
+    "name": "User Name",
+    "picture": "https://...",
+    "sub": "google-user-id",
+    "provider": "google",
+    "premium": true
+  }
+}
+```
+
+#### GET /logout
+Logout current user.
+
+**Response:**
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+### Applications
+
+#### GET /dashboard
+Get dashboard data with applications and statistics.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "user": {...},
+  "dashboard_data": {
+    "applications": [...],
+    "stats": {
+      "total_applications": 4,
+      "active_applications": 3,
+      "completed_applications": 1
+    }
+  }
+}
+```
+
+#### GET /api/applications
+List all applications.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "applications": [
+    {
+      "id": 1,
+      "name": "Stanford University",
+      "type": "Early Action",
+      "status": "In Progress",
+      "deadline": "2025-11-01",
+      "progress": 60,
+      "docs_done": 3,
+      "docs_total": 5,
+      "logo": "https://logo.clearbit.com/stanford.edu"
+    }
+  ]
+}
+```
+
+#### GET /api/applications/{id}
+Get specific application details.
+
+**Auth Required:** Yes
+
+**Parameters:**
+- `id` (int): Application ID
+
+**Response:**
+```json
+{
+  "application": {
+    "id": 1,
+    "name": "Stanford University",
+    "type": "Early Action",
+    "status": "In Progress",
+    "deadline": "2025-11-01",
+    "progress": 60,
+    "docs_done": 3,
+    "docs_total": 5,
+    "logo": "https://logo.clearbit.com/stanford.edu"
+  }
+}
+```
+
+#### GET /api/applications/analytics
+Get application analytics data.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "analytics": [...]
+}
+```
+
+### User Account
+
+#### GET /account
+Get current user account information.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "user": {
+    "email": "user@example.com",
+    "name": "User Name",
+    "picture": "https://...",
+    "provider": "google",
+    "premium": true
+  }
+}
+```
+
+### Additional Endpoints
+
+#### GET /api/schools
+Get list of schools (placeholder).
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "schools": []
+}
+```
+
+#### GET /api/deadlines
+Get application deadlines (placeholder).
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "deadlines": []
+}
+```
+
+#### GET /api/mentor
+Get mentor information (placeholder).
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "mentor": {}
+}
 ```
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `SECRET_KEY` | Flask secret key | `dev` |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Required |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Required |
-| `FRONTEND_URL` | Frontend URL for redirects | `http://localhost:3001` |
-| `REACT_APP_API_BASE_URL` | API base URL for React | `http://localhost:8000` |
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `SECRET_KEY` | Flask session secret | Yes | `dev` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Yes | - |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Yes | - |
+| `API_BASE_URL` | Base URL for API callbacks | No | `http://localhost:8000` |
 
-## Docker Commands
+## Docker Deployment
 
+### Build and Run
 ```bash
-# Build the image
-docker build -t mcb-app .
+# Build image
+docker build -t mcb-api .
 
-# Run the container
-docker run -p 8000:8000 --env-file .env mcb-app
+# Run container
+docker run -p 8000:8000 --env-file .env mcb-api
 
 # Or use Docker Compose
-docker-compose up -d
-docker-compose down
+docker-compose up --build
 ```
 
-## Deployment
+## Railway Deployment
 
-### Railway (Recommended)
-1. Connect your GitHub repository to Railway
-2. Set environment variables in Railway dashboard
-3. Deploy automatically on push
-
-### Other Platforms
-The Docker setup works with any container platform:
-- AWS ECS/Fargate
-- Google Cloud Run
-- Azure Container Instances
-- DigitalOcean App Platform
-
-## API Endpoints
-
-- `GET /` - Serve React app
-- `GET /login` - Login page
-- `GET /login/google` - Start Google OAuth
-- `GET /auth/google/callback` - OAuth callback
-- `GET /logout` - Logout
-- `GET /dashboard` - Dashboard data (JSON)
-- `GET /api/applications` - List applications
-- `GET /api/applications/<id>` - Application details
+1. **Connect Repository**: Link your GitHub repository to Railway
+2. **Set Environment Variables**: In Railway dashboard, add:
+   - `SECRET_KEY`: Your Flask secret key
+   - `GOOGLE_CLIENT_ID`: Your Google OAuth client ID
+   - `GOOGLE_CLIENT_SECRET`: Your Google OAuth client secret
+   - `API_BASE_URL`: `https://your-app-name.up.railway.app` (Railway will provide this)
+3. **Deploy**: Push to main branch to trigger automatic deployment
+4. **Access**: Your API will be available at the Railway-provided URL
 
 ## Project Structure
 
 ```
 MCB/
-├── app.py                 # Flask backend
+├── app.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
 ├── Dockerfile            # Docker configuration
 ├── docker-compose.yml    # Docker Compose setup
 ├── nixpacks.toml         # Railway deployment config
-├── templates/            # Flask HTML templates
-├── static/               # Static assets (built React app)
-├── frontend/
-│   └── dashboard/        # React frontend
-│       ├── src/
-│       ├── public/
-│       └── package.json
-└── README.md
+├── Procfile              # Heroku deployment config
+├── .env                  # Environment variables (create from .env.example)
+├── .gitignore           # Git ignore rules
+└── README.md            # This file
 ```
+
+## Authentication Flow
+
+1. Client calls `GET /login/google`
+2. User is redirected to Google OAuth
+3. Google redirects back to `GET /auth/google/callback`
+4. API returns user session data
+5. Client stores session/token for subsequent requests
+6. All protected endpoints require valid session
+
+## Error Responses
+
+All endpoints return JSON error responses:
+
+```json
+{
+  "error": "Error message description"
+}
+```
+
+Common HTTP status codes:
+- `200` - Success
+- `400` - Bad Request
+- `401` - Unauthorized
+- `404` - Not Found
+- `500` - Internal Server Error
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test with Docker
+4. Test with `python app.py`
 5. Submit a pull request
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License

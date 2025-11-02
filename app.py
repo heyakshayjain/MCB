@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session, flash, jsonify, render_template, send_from_directory
+from flask import Flask, request, redirect, url_for, session, flash, jsonify
 from flask_compress import Compress
 from functools import wraps
 from authlib.integrations.flask_client import OAuth
@@ -32,17 +32,15 @@ if os.path.exists(local_env):
 if not loaded:
     load_dotenv()
 
-app = Flask(__name__,
-            static_folder=os.getenv('FLASK_STATIC_FOLDER', 'static'),
-            template_folder=os.getenv('FLASK_TEMPLATE_FOLDER', 'templates'))
+app = Flask(__name__)
 # Prefer SECRET_KEY from env; fall back to 'dev' for local/testing
 app.secret_key = os.getenv('SECRET_KEY', 'dev')  # Change this to a secure key in production
 Compress(app)  # Enable compression for better performance
 
-# CORS configuration for React frontend
+# CORS configuration for API access
 from flask_cors import CORS
-# Allow both localhost and production domains
-CORS(app, origins=['http://localhost:8000', 'http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
+# Allow API access from various origins
+CORS(app, supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
@@ -90,31 +88,27 @@ def login_required(view):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # If already authenticated, send to dashboard
+    # If already authenticated, return user info
     if request.method == "GET" and session.get("user"):
-        return redirect(url_for("dashboard"))
+        return jsonify({"user": session.get("user")})
     if request.method == "POST":
         email = request.form.get("email", "").strip()
         password = request.form.get("password", "").strip()
         if not email or not password:
-            flash("Please enter email and password", "error")
-            return redirect(url_for("login"))
+            return jsonify({"error": "Please enter email and password"}), 400
         # TODO: replace with real auth check
         session["user"] = {"email": email}
-        return redirect(url_for("dashboard"))
-    # Return JSON for API calls, redirect to React app for web
-    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
-        return jsonify({"message": "Please use Google OAuth for authentication"})
-    # For web requests, serve the React app directly instead of redirecting
-    return render_template("index.html")
+        return jsonify({"message": "Login successful", "user": session["user"]})
+    # Return JSON for API calls
+    return jsonify({"message": "Please use Google OAuth for authentication"})
 
 
 @app.route('/login/google')
 def login_google():
     if not oauth:
         return jsonify({'error': 'Google OAuth not configured'}), 500
-    # Start Google OAuth flow - use environment-based redirect URI
-    base_url = os.getenv('FRONTEND_URL', 'http://localhost:8000')
+    # Start Google OAuth flow - use API base URL for callback
+    base_url = os.getenv('API_BASE_URL', 'http://localhost:8000')
     redirect_uri = f"{base_url}/auth/google/callback"
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -146,51 +140,25 @@ def auth_google_callback():
             'premium': True  # Hardcoded for demo; in production, check database
         }
 
-        # Return JSON for API calls, redirect for web
-        if request.headers.get('Content-Type') == 'application/json' or request.is_json:
-            return jsonify({
-                'message': 'Authentication successful',
-                'user': session['user']
-            })
-        # Redirect to appropriate dashboard URL based on environment
-        dashboard_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/dashboard'
-        return redirect(dashboard_url)
+        # Return JSON for API calls
+        return jsonify({
+            'message': 'Authentication successful',
+            'user': session['user']
+        })
     except Exception as e:
         logging.exception('Google authentication error')
-        if request.headers.get('Content-Type') == 'application/json' or request.is_json:
-            return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
-        # Redirect to appropriate login URL based on environment
-        login_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/login'
-        return redirect(login_url)
+        return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
 
 
 @app.route("/logout")
 def logout():
     session.clear()
-    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
-        return jsonify({'message': 'Logged out successfully'})
-    # Redirect to appropriate home URL based on environment
-    home_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/'
-    return redirect(home_url)
+    return jsonify({'message': 'Logged out successfully'})
 
 
 @app.route("/")
 def home():
-    return render_template("index.html")
-
-
-@app.route("/manifest.json")
-def manifest():
-    return send_from_directory(app.template_folder, "manifest.json")
-
-@app.route("/<path:path>")
-def catch_all(path):
-    # Catch-all route for React Router - serve index.html for any unmatched routes
-    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account") or path.startswith("static/"):
-        # Let Flask handle API routes, specific pages, and static files
-        return "Not Found", 404
-    # For all other routes, serve the React app
-    return render_template("index.html")
+    return jsonify({"message": "MCB College Application Assistant API", "version": "1.0.0"})
 
 
 @app.route('/dashboard')
@@ -215,12 +183,8 @@ def dashboard():
 @login_required
 def account():
     # Return JSON for API calls
-    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
-        user = session.get('user', {})
-        return jsonify({'user': user})
-    # Redirect to appropriate account URL based on environment
-    account_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/account'
-    return redirect(account_url)
+    user = session.get('user', {})
+    return jsonify({'user': user})
 
 
 # -------------------- API Routes (JSON responses for React frontend) --------------------

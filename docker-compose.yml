@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  mcb-app:
+  backend:
     build: .
     ports:
       - "8000:8000"
@@ -7,8 +9,8 @@ services:
       - SECRET_KEY=your-secret-key-here
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - FRONTEND_URL=http://localhost:8000
-      - FLASK_ENV=production
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
     volumes:
       - .:/app
     restart: unless-stopped

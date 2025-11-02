@@ -3,7 +3,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "source /opt/venv/bin/activate && gunicorn app:app --bind 0.0.0.0:$PORT"
+    "startCommand": "gunicorn app:app --bind 0.0.0.0:$PORT"
   },
   "variables": {
     "FRONTEND_URL": "https://mcb.up.railway.app",

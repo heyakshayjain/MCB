@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, request, redirect, url_for, session, flash, jsonify
 from flask_compress import Compress
 from functools import wraps
 from authlib.integrations.flask_client import OAuth
@@ -37,8 +37,10 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev')  # Change this to a secure key in production
 Compress(app)  # Enable compression for better performance
 
-# Enable file modification detection
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+# CORS configuration for React frontend
+from flask_cors import CORS
+CORS(app, origins=['http://localhost:3001'], supports_credentials=True, allow_headers=['Content-Type'])
+
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
 app.config.setdefault('SESSION_COOKIE_SECURE', False)  # True behind HTTPS
@@ -80,18 +82,6 @@ def login_required(view):
     return wrapped
 
 
-@app.context_processor
-def inject_globals():
-    # Provide current year to all templates
-    return {
-        'current_year': datetime.now(UTC).year
-    }
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     # If already authenticated, send to dashboard
@@ -106,14 +96,17 @@ def login():
         # TODO: replace with real auth check
         session["user"] = {"email": email}
         return redirect(url_for("dashboard"))
-    return render_template("login.html")
+    # Return JSON for API calls, redirect to React app for web
+    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
+        return jsonify({"message": "Please use Google OAuth for authentication"})
+    return redirect("http://localhost:3001/login")
 
 
 @app.route('/login/google')
 def login_google():
-    # Start Google OAuth flow
-    redirect_uri = url_for('auth_google_callback', _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
+    # Start Google OAuth flow - redirect_uri is configured in Google Console
+    # The redirect_uri should match what's set in Google OAuth Console
+    return oauth.google.authorize_redirect('http://localhost:8000/auth/google/callback')
 
 
 @app.route('/auth/google/callback')
@@ -131,8 +124,7 @@ def auth_google_callback():
             logging.info('Parsed ID token for userinfo: %s', 'yes' if userinfo else 'no')
 
         if not userinfo:
-            flash('Google authentication failed. Please try again.', 'error')
-            return redirect(url_for('login'))
+            return jsonify({'error': 'Google authentication failed'}), 400
 
         # Save minimal user session
         session['user'] = {
@@ -140,42 +132,62 @@ def auth_google_callback():
             'name': userinfo.get('name'),
             'picture': userinfo.get('picture'),
             'sub': userinfo.get('sub'),
-            'provider': 'google'
+            'provider': 'google',
+            'premium': True  # Hardcoded for demo; in production, check database
         }
-        flash(f"Welcome, { session['user'].get('name') or session['user'].get('email') }!", 'success')
-        return redirect(url_for('dashboard'))
+
+        # Return JSON for API calls, redirect for web
+        if request.headers.get('Content-Type') == 'application/json' or request.is_json:
+            return jsonify({
+                'message': 'Authentication successful',
+                'user': session['user']
+            })
+        # Always redirect to React dashboard
+        return redirect("http://localhost:3001/dashboard")
     except Exception as e:
         logging.exception('Google authentication error')
-        flash('Google authentication error: %s' % str(e), 'error')
-        return redirect(url_for('login'))
+        if request.headers.get('Content-Type') == 'application/json' or request.is_json:
+            return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
+        return redirect("http://localhost:3001/login")
 
 
 @app.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("home"))
-
-
-@app.route('/career-options')
-def career_options():
-    return render_template('career-options.html')
+    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
+        return jsonify({'message': 'Logged out successfully'})
+    return redirect("http://localhost:3001/")
 
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    # Always return JSON for API calls from React
+    user = session.get('user', {})
+    return jsonify({
+        'user': user,
+        'dashboard_data': {
+            'applications': _demo_applications(),
+            'stats': {
+                'total_applications': 4,
+                'active_applications': 3,
+                'completed_applications': 1
+            }
+        }
+    })
 
 
 @app.route('/account')
 @login_required
 def account():
-    # Expose user profile details stored in session
-    user = session.get('user', {})
-    return render_template('account.html', user=user)
+    # Return JSON for API calls
+    if request.headers.get('Content-Type') == 'application/json' or request.is_json:
+        user = session.get('user', {})
+        return jsonify({'user': user})
+    return redirect("http://localhost:3001/account")
 
 
-# -------------------- Applications (Demo data and routes) --------------------
+# -------------------- API Routes (JSON responses for React frontend) --------------------
 
 def _demo_applications():
     return [
@@ -226,52 +238,51 @@ def _demo_applications():
     ]
 
 
-@app.route('/applications')
+@app.route('/api/applications')
 @login_required
-def applications():
+def api_applications():
     apps = _demo_applications()
-    return render_template('applications.html', apps=apps)
+    return jsonify({'applications': apps})
 
 
-@app.route('/applications/<int:app_id>')
+@app.route('/api/applications/<int:app_id>')
 @login_required
-def application_detail(app_id: int):
+def api_application_detail(app_id: int):
     apps = _demo_applications()
     app_item = next((a for a in apps if a['id'] == app_id), None)
     if not app_item:
-        flash('Application not found', 'error')
-        return redirect(url_for('applications'))
-    return render_template('application_detail.html', app_item=app_item)
+        return jsonify({'error': 'Application not found'}), 404
+    return jsonify({'application': app_item})
 
 
-@app.route('/applications/analytics')
+@app.route('/api/applications/analytics')
 @login_required
-def applications_analytics():
+def api_applications_analytics():
     apps = _demo_applications()
-    return render_template('applications_analytics.html', apps=apps)
+    return jsonify({'analytics': apps})
 
 
-@app.route('/schools')
+@app.route('/api/schools')
 @login_required
-def schools():
-    return render_template('schools.html')
+def api_schools():
+    return jsonify({'schools': []})
 
 
-@app.route('/deadlines')
+@app.route('/api/deadlines')
 @login_required
-def deadlines():
-    return render_template('deadlines.html')
+def api_deadlines():
+    return jsonify({'deadlines': []})
 
 
-@app.route('/mentor')
+@app.route('/api/mentor')
 @login_required
-def mentor():
-    return render_template('mentor.html')
+def api_mentor():
+    return jsonify({'mentor': {}})
 
 
 if __name__ == '__main__':
     try:
-        # Use port 8000 to avoid conflicts with AirPlay on macOS
+        # Use port 8000 for Flask backend API
         app.run(debug=True, port=8000, host='127.0.0.1')
     except Exception as e:
-        print(f"Error starting server: {e}")
+        print(f"Error starting Flask server: {e}")

@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="100" height="50" viewBox="0 0 100 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20 15 h60 v20 h-60 Z" fill="#1565C0"/>
-    <text x="50" y="30" font-family="Arial" font-size="12" fill="white" text-anchor="middle">MIT</text>
-</svg>

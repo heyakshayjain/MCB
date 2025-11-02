@@ -14,7 +14,7 @@ const Dashboard: React.FC = () => {
     // Fetch user data from Flask API
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/dashboard`, {
           credentials: 'include', // Include cookies for session
         });
 

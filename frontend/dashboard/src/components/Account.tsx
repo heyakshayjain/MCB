@@ -115,7 +115,7 @@ const Account: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/profile', {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ const Account: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8000/logout', {
+      await fetch(`${process.env.REACT_APP_API_BASE_URL}/logout`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -160,7 +160,7 @@ const Account: React.FC = () => {
     formDataUpload.append('type', file.type);
 
     try {
-      const response = await fetch('http://localhost:8000/api/upload-document', {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/upload-document`, {
         method: 'POST',
         credentials: 'include',
         body: formDataUpload,
@@ -182,7 +182,7 @@ const Account: React.FC = () => {
 
   const deleteDocument = async (docId: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/documents/${docId}`, {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/documents/${docId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

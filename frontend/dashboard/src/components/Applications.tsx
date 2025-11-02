@@ -20,7 +20,7 @@ const Applications: React.FC = () => {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/applications', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/applications`, {
           credentials: 'include',
         });
 

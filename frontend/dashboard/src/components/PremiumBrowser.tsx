@@ -23,7 +23,7 @@ const PremiumBrowser: React.FC = () => {
     // Fetch user data to check premium status
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/dashboard`, {
           credentials: 'include',
         });
 

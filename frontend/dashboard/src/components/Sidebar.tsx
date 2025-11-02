@@ -14,7 +14,7 @@ const Sidebar: React.FC = () => {
     // Fetch user data from Flask API
     const fetchUserData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/dashboard`, {
           credentials: 'include',
         });
 
@@ -148,7 +148,7 @@ const Sidebar: React.FC = () => {
             <button
               onClick={async () => {
                 try {
-                  await fetch('http://localhost:8000/logout', {
+                  await fetch(`${process.env.REACT_APP_API_BASE_URL}/logout`, {
                     method: 'GET',
                     credentials: 'include',
                     headers: {

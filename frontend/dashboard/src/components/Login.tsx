@@ -4,14 +4,14 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = () => {
     // Redirect to Flask backend for Google OAuth
-    window.location.href = 'http://localhost:8000/login/google';
+    window.location.href = `${process.env.REACT_APP_API_BASE_URL}/login/google`;
   };
 
   // Check if user is already authenticated on component mount
   React.useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:8000/dashboard', {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/dashboard`, {
           method: 'GET',
           credentials: 'include',
           headers: {

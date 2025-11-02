@@ -1,163 +1,155 @@
-# College Application Assistant
+# MCB - College Application Assistant
 
-A comprehensive web application to help students manage their college applications with AI-powered assistance and premium browser features.
+A full-stack web application for managing college applications with Google OAuth authentication, built with React frontend and Flask backend.
 
 ## Features
 
-### Free Features
-- Google OAuth authentication
-- Application dashboard
-- School search and tracking
-- Application deadline management
-- AI mentor chat
-- JEE application guide
-
-### Premium Features ($)
-- **AI Application Assistant**: Intelligent form-filling help
-- **Premium Browser**: Embedded browser for application sites
-- **Document Management**: Drag-and-drop document uploads
-- **Quick Copy Tools**: One-click copying of personal/academic data
+- 🔐 Google OAuth authentication
+- 📊 Application tracking dashboard
+- 🎯 Step-by-step application guidance
+- 🌐 Integrated browser for application forms
+- 📱 Responsive design
+- 🔍 Google Custom Search integration
 
 ## Tech Stack
 
-- **Backend**: Flask (Python)
-- **Frontend**: React + TypeScript + Tailwind CSS
-- **Database**: PostgreSQL (Railway)
-- **Authentication**: Google OAuth
-- **Deployment**: Railway (Free tier)
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **Backend**: Flask, Python 3.11
+- **Database**: SQLite (development) / PostgreSQL (production)
+- **Authentication**: Google OAuth 2.0
+- **Deployment**: Docker, Railway
 
-## Local Development
+## Quick Start with Docker
+
+### Prerequisites
+- Docker and Docker Compose installed
+- Google OAuth credentials
+
+### Setup
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
-   cd college-app-assistant
+   git clone https://github.com/heyakshayjain/MCB.git
+   cd MCB
    ```
 
-2. **Backend Setup**
+2. **Create environment file**
    ```bash
-   # Install Python dependencies
-   pip install -r requirements.txt
-
-   # Set environment variables
-   export GOOGLE_CLIENT_ID="your-google-client-id"
-   export GOOGLE_CLIENT_SECRET="your-google-client-secret"
-   export SECRET_KEY="your-secret-key"
-
-   # Run Flask app
-   python app.py
+   cp .env.example .env
    ```
 
-3. **Frontend Setup**
+   Edit `.env` with your configuration:
+   ```env
+   SECRET_KEY=your-secret-key-here
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   FRONTEND_URL=http://localhost:8000
+   ```
+
+3. **Build and run with Docker Compose**
    ```bash
-   cd frontend/dashboard
-   npm install
-   npm start
+   docker-compose up --build
    ```
 
-## Production Deployment (Railway - FREE)
+4. **Access the application**
+   - Open http://localhost:8000 in your browser
 
-### 1. Prepare for Deployment
+## Manual Development Setup
+
+### Backend Setup
 ```bash
-# Build React production assets
-cd frontend/dashboard
-npm run build
+# Install Python dependencies
+pip install -r requirements.txt
 
-# Copy build files to Flask static/templates
-cd ../..
-cp -r frontend/dashboard/build/* static/
-cp frontend/dashboard/build/index.html templates/
+# Run Flask backend
+python app.py
 ```
 
-### 2. Railway Deployment
-1. **Create Railway Account**: https://railway.app
-2. **Connect GitHub**: Link your repository
-3. **Auto-deploy**: Railway detects Flask automatically
-4. **Set Environment Variables**:
-   - `GOOGLE_CLIENT_ID`
-   - `GOOGLE_CLIENT_SECRET`
-   - `SECRET_KEY`
-5. **Add Database**: Click "Add PostgreSQL" in Railway dashboard
+### Frontend Setup
+```bash
+# Install Node.js dependencies
+cd frontend/dashboard
+npm install
 
-### 3. Update Google OAuth
-- Add your Railway domain to Google OAuth authorized redirect URIs
-- Format: `https://your-app-name.up.railway.app/auth/google/callback`
+# Start React development server
+npm start
+```
 
 ## Environment Variables
 
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SECRET_KEY` | Flask secret key | `dev` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | Required |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | Required |
+| `FRONTEND_URL` | Frontend URL for redirects | `http://localhost:3001` |
+| `REACT_APP_API_BASE_URL` | API base URL for React | `http://localhost:8000` |
+
+## Docker Commands
+
 ```bash
-# Required
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-SECRET_KEY=your_secure_random_key
+# Build the image
+docker build -t mcb-app .
 
-# Optional (Railway provides automatically)
-DATABASE_URL=postgresql://...
-PORT=8000
+# Run the container
+docker run -p 8000:8000 --env-file .env mcb-app
+
+# Or use Docker Compose
+docker-compose up -d
+docker-compose down
 ```
 
-## Database Schema
+## Deployment
 
-```sql
--- Users table
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    google_id VARCHAR(255) UNIQUE,
-    email VARCHAR(255) UNIQUE,
-    name VARCHAR(255),
-    premium BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### Railway (Recommended)
+1. Connect your GitHub repository to Railway
+2. Set environment variables in Railway dashboard
+3. Deploy automatically on push
 
--- Applications table
-CREATE TABLE applications (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users(id),
-    school_name VARCHAR(255),
-    application_type VARCHAR(255),
-    status VARCHAR(255),
-    deadline DATE,
-    progress INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+### Other Platforms
+The Docker setup works with any container platform:
+- AWS ECS/Fargate
+- Google Cloud Run
+- Azure Container Instances
+- DigitalOcean App Platform
 
 ## API Endpoints
 
-- `GET /` - React app
-- `POST /login` - Google OAuth login
-- `GET /dashboard` - User dashboard data
-- `GET /api/applications` - List user applications
+- `GET /` - Serve React app
+- `GET /login` - Login page
+- `GET /login/google` - Start Google OAuth
+- `GET /auth/google/callback` - OAuth callback
 - `GET /logout` - Logout
+- `GET /dashboard` - Dashboard data (JSON)
+- `GET /api/applications` - List applications
+- `GET /api/applications/<id>` - Application details
 
-## Premium Features
+## Project Structure
 
-### AI Application Assistant
-- Contextual help for application forms
-- Smart suggestions based on user data
-- Form auto-fill capabilities
-
-### Premium Browser
-- Embedded iframe browser
-- Direct access to application websites
-- Drag-and-drop document uploads
-- Quick copy tools for personal data
-
-## Cost Structure
-
-- **Free Tier**: Basic features, unlimited users
-- **Premium Tier**: $9.99/month per user
-  - AI Application Assistant
-  - Premium Browser
-  - Document management
-  - Priority support
+```
+MCB/
+├── app.py                 # Flask backend
+├── requirements.txt       # Python dependencies
+├── Dockerfile            # Docker configuration
+├── docker-compose.yml    # Docker Compose setup
+├── nixpacks.toml         # Railway deployment config
+├── templates/            # Flask HTML templates
+├── static/               # Static assets (built React app)
+├── frontend/
+│   └── dashboard/        # React frontend
+│       ├── src/
+│       ├── public/
+│       └── package.json
+└── README.md
+```
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Submit a pull request
+4. Test with Docker
+5. Submit a pull request
 
 ## License
 

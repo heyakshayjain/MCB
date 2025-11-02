@@ -32,7 +32,9 @@ if os.path.exists(local_env):
 if not loaded:
     load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder=os.getenv('FLASK_STATIC_FOLDER', 'static'),
+            template_folder=os.getenv('FLASK_TEMPLATE_FOLDER', 'templates'))
 # Prefer SECRET_KEY from env; fall back to 'dev' for local/testing
 app.secret_key = os.getenv('SECRET_KEY', 'dev')  # Change this to a secure key in production
 Compress(app)  # Enable compression for better performance
@@ -180,8 +182,8 @@ def home():
 @app.route("/<path:path>")
 def catch_all(path):
     # Catch-all route for React Router - serve index.html for any unmatched routes
-    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account"):
-        # Let Flask handle API routes and specific pages
+    if path.startswith("api/") or path.startswith("login") or path.startswith("logout") or path.startswith("auth/") or path.startswith("dashboard") or path.startswith("account") or path.startswith("static/") or path == "manifest.json":
+        # Let Flask handle API routes, specific pages, static files, and manifest
         return "Not Found", 404
     # For all other routes, serve the React app
     return render_template("index.html")
@@ -312,7 +314,7 @@ def api_mentor():
 
 if __name__ == '__main__':
     try:
-        # Use port 8000 for Flask backend API
-        app.run(debug=True, port=8000, host='127.0.0.1')
+        # Use port 8000 for Flask backend API - bind to all interfaces for Docker
+        app.run(debug=True, host='0.0.0.0', port=8000)
     except Exception as e:
         print(f"Error starting Flask server: {e}")

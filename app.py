@@ -160,7 +160,7 @@ def auth_google_callback():
         if request.headers.get('Content-Type') == 'application/json' or request.is_json:
             return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
         # Redirect to appropriate login URL based on environment
-        login_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/login'
+        login_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/login'
         return redirect(login_url)
 
 
@@ -170,7 +170,7 @@ def logout():
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({'message': 'Logged out successfully'})
     # Redirect to appropriate home URL based on environment
-    home_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/'
+    home_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/'
     return redirect(home_url)
 
 
@@ -219,7 +219,7 @@ def account():
         user = session.get('user', {})
         return jsonify({'user': user})
     # Redirect to appropriate account URL based on environment
-    account_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/account'
+    account_url = os.getenv('FRONTEND_URL', 'http://localhost:8000') + '/account'
     return redirect(account_url)
 
 

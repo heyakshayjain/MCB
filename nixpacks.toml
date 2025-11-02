@@ -13,7 +13,9 @@ cmds = [
     "cd frontend/dashboard && npm run build",
     "rm -rf static/*",
     "cp -r frontend/dashboard/build/* static/",
-    "cp static/index.html templates/index.html"
+    "cp static/index.html templates/index.html",
+    "ls -la static/static/js/ | head -10",
+    "ls -la static/static/css/ | head -10"
 ]
 
 [start]

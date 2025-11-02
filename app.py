@@ -42,7 +42,7 @@ Compress(app)  # Enable compression for better performance
 # CORS configuration for React frontend
 from flask_cors import CORS
 # Allow both localhost and production domains
-CORS(app, origins=['http://localhost:8000', 'http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
+CORS(app, origins=['http://localhost:8000', 'http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')

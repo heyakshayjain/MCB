@@ -103,7 +103,9 @@ def login():
     # Return JSON for API calls, redirect to React app for web
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({"message": "Please use Google OAuth for authentication"})
-    return redirect("https://mcb.up.railway.app/login")
+    # Redirect to appropriate login URL based on environment
+    login_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/login'
+    return redirect(login_url)
 
 
 @app.route('/login/google')
@@ -148,13 +150,16 @@ def auth_google_callback():
                 'message': 'Authentication successful',
                 'user': session['user']
             })
-        # Always redirect to React dashboard
-        return redirect("https://mcb.up.railway.app/dashboard")
+        # Redirect to appropriate dashboard URL based on environment
+        dashboard_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/dashboard'
+        return redirect(dashboard_url)
     except Exception as e:
         logging.exception('Google authentication error')
         if request.headers.get('Content-Type') == 'application/json' or request.is_json:
             return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
-        return redirect("https://mcb.up.railway.app/login")
+        # Redirect to appropriate login URL based on environment
+        login_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/login'
+        return redirect(login_url)
 
 
 @app.route("/logout")
@@ -162,7 +167,9 @@ def logout():
     session.clear()
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({'message': 'Logged out successfully'})
-    return redirect("https://mcb.up.railway.app/")
+    # Redirect to appropriate home URL based on environment
+    home_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/'
+    return redirect(home_url)
 
 
 @app.route("/")
@@ -205,7 +212,9 @@ def account():
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         user = session.get('user', {})
         return jsonify({'user': user})
-    return redirect("https://mcb.up.railway.app/account")
+    # Redirect to appropriate account URL based on environment
+    account_url = os.getenv('FRONTEND_URL', 'http://localhost:3001') + '/account'
+    return redirect(account_url)
 
 
 # -------------------- API Routes (JSON responses for React frontend) --------------------

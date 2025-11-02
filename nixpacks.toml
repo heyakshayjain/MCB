@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs", "python3"]
+nixPkgs = ["nodejs", "python3", "python3Packages.pip"]
 
 [phases.install]
 cmds = [
-    "python3 -m pip install --user -r requirements.txt",
+    "pip3 install -r requirements.txt",
     "cd frontend/dashboard && npm install"
 ]
 
@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = "python3 -m gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"

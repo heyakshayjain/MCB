@@ -4,8 +4,14 @@ from functools import wraps
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv, find_dotenv
 import os
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 import logging
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Load environment variables from .env files if present (robust resolution)
 # 1) .env in project root (next to this file)
@@ -36,6 +42,63 @@ app = Flask(__name__)
 # Prefer SECRET_KEY from env; fall back to 'dev' for local/testing
 app.secret_key = os.getenv('SECRET_KEY', 'dev')  # Change this to a secure key in production
 Compress(app)  # Enable compression for better performance
+
+# Database configuration
+database_url = os.getenv('DATABASE_URL')
+if database_url:
+    if 'railway' in database_url:
+        # Railway provides PostgreSQL, ensure correct protocol
+        database_url = database_url.replace('postgres://', 'postgresql://')
+    elif 'mcbdatabase.railway.internal' in database_url:
+        # Use Railway private networking for database
+        pass  # Keep as-is, Railway handles the connection
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Fallback to SQLite for local development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mcb.db'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+# Database Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=True)  # For traditional login
+    name = db.Column(db.String(100), nullable=True)
+    google_id = db.Column(db.String(100), unique=True, nullable=True)
+    profile_picture = db.Column(db.String(500), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_premium = db.Column(db.Boolean, default=False)
+    reset_token = db.Column(db.String(100), unique=True, nullable=True)
+    reset_token_expires = db.Column(db.DateTime, nullable=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'profile_picture': self.profile_picture,
+            'google_id': self.google_id,
+            'created_at': self.created_at.isoformat(),
+            'is_premium': self.is_premium
+        }
+
+    def generate_reset_token(self):
+        self.reset_token = secrets.token_urlsafe(32)
+        self.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+        db.session.commit()
+        return self.reset_token
+
+    def verify_reset_token(self, token):
+        if self.reset_token == token and self.reset_token_expires > datetime.utcnow():
+            return True
+        return False
+
+    def clear_reset_token(self):
+        self.reset_token = None
+        self.reset_token_expires = None
+        db.session.commit()
 
 # CORS configuration for API access
 from flask_cors import CORS
@@ -91,14 +154,23 @@ def login():
     # If already authenticated, return user info
     if request.method == "GET" and session.get("user"):
         return jsonify({"user": session.get("user")})
+
     if request.method == "POST":
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "").strip()
+        data = request.get_json() or {}
+        email = data.get("email", "").strip()
+        password = data.get("password", "").strip()
+
         if not email or not password:
             return jsonify({"error": "Please enter email and password"}), 400
-        # TODO: replace with real auth check
-        session["user"] = {"email": email}
-        return jsonify({"message": "Login successful", "user": session["user"]})
+
+        # Check database for user
+        user = User.query.filter_by(email=email).first()
+        if user and user.password_hash and check_password_hash(user.password_hash, password):
+            session["user"] = user.to_dict()
+            return jsonify({"message": "Login successful", "user": session["user"]})
+        else:
+            return jsonify({"error": "Invalid email or password"}), 401
+
     # Return JSON for API calls
     return jsonify({"message": "Please use Google OAuth for authentication"})
 
@@ -130,15 +202,29 @@ def auth_google_callback():
         if not userinfo:
             return jsonify({'error': 'Google authentication failed'}), 400
 
-        # Save minimal user session
-        session['user'] = {
-            'email': userinfo.get('email'),
-            'name': userinfo.get('name'),
-            'picture': userinfo.get('picture'),
-            'sub': userinfo.get('sub'),
-            'provider': 'google',
-            'premium': True  # Hardcoded for demo; in production, check database
-        }
+        # Check if user exists in database, create if not
+        user = User.query.filter_by(google_id=userinfo.get('sub')).first()
+        if not user:
+            user = User.query.filter_by(email=userinfo.get('email')).first()
+            if not user:
+                # Create new user
+                user = User(
+                    email=userinfo.get('email'),
+                    name=userinfo.get('name'),
+                    google_id=userinfo.get('sub'),
+                    profile_picture=userinfo.get('picture'),
+                    is_premium=True  # Default for Google OAuth users
+                )
+                db.session.add(user)
+                db.session.commit()
+            else:
+                # Update existing user with Google ID
+                user.google_id = userinfo.get('sub')
+                user.profile_picture = userinfo.get('picture')
+                db.session.commit()
+
+        # Save user session
+        session['user'] = user.to_dict()
 
         # Return JSON for API calls
         return jsonify({
@@ -149,6 +235,92 @@ def auth_google_callback():
         logging.exception('Google authentication error')
         return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
 
+
+def send_reset_email(email, reset_token):
+    """Send password reset email (placeholder - implement with your email service)"""
+    try:
+        # This is a placeholder - implement with your email service (SendGrid, Mailgun, etc.)
+        print(f"Password reset requested for {email}. Token: {reset_token}")
+        print(f"Reset link: https://your-frontend-url.com/reset-password?token={reset_token}")
+        # In production, send actual email here
+        return True
+    except Exception as e:
+        print(f"Error sending reset email: {e}")
+        return False
+
+@app.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+
+    if not email:
+        return jsonify({"error": "Please provide an email address"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.password_hash:
+        # Don't reveal if email exists or not for security
+        return jsonify({"message": "If an account with this email exists, a password reset link has been sent"}), 200
+
+    # Generate reset token
+    reset_token = user.generate_reset_token()
+
+    # Send reset email
+    if send_reset_email(email, reset_token):
+        return jsonify({"message": "If an account with this email exists, a password reset link has been sent"}), 200
+    else:
+        return jsonify({"error": "Failed to send reset email"}), 500
+
+@app.route("/reset-password", methods=["POST"])
+def reset_password():
+    data = request.get_json() or {}
+    token = data.get("token", "").strip()
+    new_password = data.get("password", "").strip()
+
+    if not token or not new_password:
+        return jsonify({"error": "Please provide token and new password"}), 400
+
+    # Find user by reset token
+    user = User.query.filter_by(reset_token=token).first()
+    if not user or not user.verify_reset_token(token):
+        return jsonify({"error": "Invalid or expired reset token"}), 400
+
+    # Update password
+    user.password_hash = generate_password_hash(new_password)
+    user.clear_reset_token()
+    db.session.commit()
+
+    return jsonify({"message": "Password reset successful"}), 200
+
+@app.route("/register", methods=["POST"])
+def register():
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
+    name = data.get("name", "").strip()
+
+    if not email or not password or not name:
+        return jsonify({"error": "Please provide email, password, and name"}), 400
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "User with this email already exists"}), 409
+
+    # Create new user
+    password_hash = generate_password_hash(password)
+    new_user = User(
+        email=email,
+        password_hash=password_hash,
+        name=name,
+        is_premium=False  # Default for regular registration
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    # Auto-login after registration
+    session["user"] = new_user.to_dict()
+    return jsonify({"message": "Registration successful", "user": session["user"]}), 201
 
 @app.route("/logout")
 def logout():
@@ -279,6 +451,10 @@ def api_deadlines():
 def api_mentor():
     return jsonify({'mentor': {}})
 
+
+# Create database tables
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     try:

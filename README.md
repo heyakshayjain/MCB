@@ -77,11 +77,13 @@ Check current authentication status.
 ```json
 {
   "user": {
+    "id": 1,
     "email": "user@example.com",
     "name": "User Name",
-    "picture": "https://...",
-    "provider": "google",
-    "premium": true
+    "profile_picture": "https://...",
+    "google_id": "google-user-id",
+    "created_at": "2025-01-01T00:00:00",
+    "is_premium": true
   }
 }
 ```
@@ -90,6 +92,90 @@ Check current authentication status.
 ```json
 {
   "message": "Please use Google OAuth for authentication"
+}
+```
+
+#### POST /login
+Traditional email/password login.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "userpassword"
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
+#### POST /register
+User registration with email/password.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "User Name"
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "Registration successful",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
+#### POST /forgot-password
+Request password reset email.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "If an account with this email exists, a password reset link has been sent"
+}
+```
+
+#### POST /reset-password
+Reset password using reset token.
+
+**Request Body:**
+```json
+{
+  "token": "reset-token-from-email",
+  "password": "newsecurepassword"
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "Password reset successful"
 }
 ```
 

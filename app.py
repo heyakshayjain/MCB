@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, url_for, session, flash, jsonify
+from flask import Flask, request, redirect, url_for, session, flash, jsonify, render_template
 from flask_compress import Compress
 from functools import wraps
 from authlib.integrations.flask_client import OAuth
@@ -165,6 +165,11 @@ def logout():
     return redirect("https://mcb.up.railway.app/")
 
 
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -190,7 +195,7 @@ def account():
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         user = session.get('user', {})
         return jsonify({'user': user})
-    return redirect("http://localhost:3001/account")
+    return redirect("https://mcb.up.railway.app/account")
 
 
 # -------------------- API Routes (JSON responses for React frontend) --------------------

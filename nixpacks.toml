@@ -11,6 +11,7 @@ cmds = [
 [phases.build]
 cmds = [
     "cd frontend/dashboard && npm run build",
+    "rm -rf static/*",
     "cp -r frontend/dashboard/build/* static/"
 ]
 

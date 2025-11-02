@@ -3,7 +3,7 @@ nixPkgs = ["nodejs", "python3"]
 
 [phases.install]
 cmds = [
-    "pip install -r requirements.txt",
+    "python3 -m pip install --user -r requirements.txt",
     "cd frontend/dashboard && npm install"
 ]
 
@@ -14,4 +14,4 @@ cmds = [
 ]
 
 [start]
-cmd = "gunicorn app:app --bind 0.0.0.0:$PORT"
+cmd = "python3 -m gunicorn app:app --bind 0.0.0.0:$PORT"

@@ -40,7 +40,7 @@ Compress(app)  # Enable compression for better performance
 # CORS configuration for React frontend
 from flask_cors import CORS
 # For production, update this with your Railway domain
-CORS(app, origins=['http://localhost:3001', 'https://your-app-name.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
+CORS(app, origins=['http://localhost:3001', 'https://mcb.up.railway.app'], supports_credentials=True, allow_headers=['Content-Type'])
 
 # Session cookie tweaks for local dev
 app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
@@ -103,7 +103,7 @@ def login():
     # Return JSON for API calls, redirect to React app for web
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({"message": "Please use Google OAuth for authentication"})
-    return redirect("http://localhost:3001/login")
+    return redirect("https://mcb.up.railway.app/login")
 
 
 @app.route('/login/google')
@@ -112,7 +112,7 @@ def login_google():
         return jsonify({'error': 'Google OAuth not configured'}), 500
     # Start Google OAuth flow - redirect_uri is configured in Google Console
     # The redirect_uri should match what's set in Google OAuth Console
-    return oauth.google.authorize_redirect('http://localhost:8000/auth/google/callback')
+    return oauth.google.authorize_redirect('https://mcb.up.railway.app/auth/google/callback')
 
 
 @app.route('/auth/google/callback')
@@ -149,12 +149,12 @@ def auth_google_callback():
                 'user': session['user']
             })
         # Always redirect to React dashboard
-        return redirect("http://localhost:3001/dashboard")
+        return redirect("https://mcb.up.railway.app/dashboard")
     except Exception as e:
         logging.exception('Google authentication error')
         if request.headers.get('Content-Type') == 'application/json' or request.is_json:
             return jsonify({'error': 'Google authentication error: %s' % str(e)}), 500
-        return redirect("http://localhost:3001/login")
+        return redirect("https://mcb.up.railway.app/login")
 
 
 @app.route("/logout")
@@ -162,7 +162,7 @@ def logout():
     session.clear()
     if request.headers.get('Content-Type') == 'application/json' or request.is_json:
         return jsonify({'message': 'Logged out successfully'})
-    return redirect("http://localhost:3001/")
+    return redirect("https://mcb.up.railway.app/")
 
 
 @app.route('/dashboard')

@@ -174,6 +174,60 @@ def login():
     # Return JSON for API calls
     return jsonify({"message": "Please use Google OAuth for authentication"})
 
+@app.route("/api/login", methods=["POST"])
+def api_login():
+    """API endpoint for login"""
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
+
+    if not email or not password:
+        return jsonify({"error": "Please enter email and password"}), 400
+
+    # Check database for user
+    user = User.query.filter_by(email=email).first()
+    if user and user.password_hash and check_password_hash(user.password_hash, password):
+        session["user"] = user.to_dict()
+        return jsonify({"message": "Login successful", "user": session["user"]})
+    else:
+        return jsonify({"error": "Invalid email or password"}), 401
+
+@app.route("/api/register", methods=["POST"])
+def api_register():
+    """API endpoint for user registration"""
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
+    name = data.get("name", "").strip()
+
+    if not email or not password or not name:
+        return jsonify({"error": "Please provide email, password, and name"}), 400
+
+    # Validate password length
+    if len(password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "User with this email already exists"}), 409
+
+    # Create new user
+    password_hash = generate_password_hash(password)
+    new_user = User(
+        email=email,
+        password_hash=password_hash,
+        name=name,
+        is_premium=False  # Default for regular registration
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    # Auto-login after registration
+    session["user"] = new_user.to_dict()
+    return jsonify({"message": "Registration successful", "user": session["user"]}), 201
+
 
 @app.route('/login/google')
 def login_google():
@@ -321,6 +375,92 @@ def register():
     # Auto-login after registration
     session["user"] = new_user.to_dict()
     return jsonify({"message": "Registration successful", "user": session["user"]}), 201
+
+@app.route("/api/users", methods=["POST"])
+@login_required
+def create_user():
+    """Admin endpoint to create users (requires authentication)"""
+    data = request.get_json() or {}
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
+    name = data.get("name", "").strip()
+    is_premium = data.get("is_premium", False)
+
+    if not email or not password or not name:
+        return jsonify({"error": "Please provide email, password, and name"}), 400
+
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "User with this email already exists"}), 409
+
+    # Create new user
+    password_hash = generate_password_hash(password)
+    new_user = User(
+        email=email,
+        password_hash=password_hash,
+        name=name,
+        is_premium=is_premium
+    )
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({
+        "message": "User created successfully",
+        "user": new_user.to_dict()
+    }), 201
+
+@app.route("/api/users", methods=["GET"])
+@login_required
+def get_users():
+    """Get all users (requires authentication)"""
+    users = User.query.all()
+    return jsonify({
+        "users": [user.to_dict() for user in users]
+    })
+
+@app.route("/api/users/<int:user_id>", methods=["GET"])
+@login_required
+def get_user(user_id):
+    """Get specific user by ID (requires authentication)"""
+    user = User.query.get_or_404(user_id)
+    return jsonify({"user": user.to_dict()})
+
+@app.route("/api/users/<int:user_id>", methods=["PUT"])
+@login_required
+def update_user(user_id):
+    """Update user (requires authentication)"""
+    user = User.query.get_or_404(user_id)
+    data = request.get_json() or {}
+
+    # Update allowed fields
+    if "name" in data:
+        user.name = data["name"]
+    if "is_premium" in data:
+        user.is_premium = data["is_premium"]
+
+    # Only update password if provided
+    if "password" in data and data["password"]:
+        user.password_hash = generate_password_hash(data["password"])
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "User updated successfully",
+        "user": user.to_dict()
+    })
+
+@app.route("/api/users/<int:user_id>", methods=["DELETE"])
+@login_required
+def delete_user(user_id):
+    """Delete user (requires authentication)"""
+    user = User.query.get_or_404(user_id)
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"message": "User deleted successfully"})
 
 @app.route("/logout")
 def logout():

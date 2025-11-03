@@ -144,6 +144,55 @@ User registration with email/password.
 }
 ```
 
+#### POST /api/login
+API endpoint for user login.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "Login successful",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
+#### POST /api/register
+API endpoint for user registration.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "User Name"
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "Registration successful",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
 #### POST /forgot-password
 Request password reset email.
 
@@ -350,6 +399,111 @@ Get mentor information (placeholder).
 ```json
 {
   "mentor": {}
+}
+```
+
+### User Management
+
+#### POST /api/users
+Create a new user (admin endpoint).
+
+**Auth Required:** Yes
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword",
+  "name": "User Name",
+  "is_premium": false
+}
+```
+
+**Response (success):**
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
+#### GET /api/users
+Get all users.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "user@example.com",
+      "name": "User Name",
+      "is_premium": false
+    }
+  ]
+}
+```
+
+#### GET /api/users/{id}
+Get specific user by ID.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "User Name",
+    "is_premium": false
+  }
+}
+```
+
+#### PUT /api/users/{id}
+Update user information.
+
+**Auth Required:** Yes
+
+**Request Body:**
+```json
+{
+  "name": "Updated Name",
+  "is_premium": true,
+  "password": "newpassword"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "User updated successfully",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "Updated Name",
+    "is_premium": true
+  }
+}
+```
+
+#### DELETE /api/users/{id}
+Delete a user.
+
+**Auth Required:** Yes
+
+**Response:**
+```json
+{
+  "message": "User deleted successfully"
 }
 ```
 

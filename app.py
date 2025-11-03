@@ -179,9 +179,9 @@ def login():
 def login_google():
     if not oauth:
         return jsonify({'error': 'Google OAuth not configured'}), 500
-    # Start Google OAuth flow - use API base URL for callback
-    base_url = os.getenv('API_BASE_URL', 'https://mcb.up.railway.app')
-    redirect_uri = f"{base_url}/auth/google/callback"
+    # Start Google OAuth flow - use frontend URL for callback since Google redirects to frontend
+    frontend_url = os.getenv('FRONTEND_URL', request.headers.get('Referer', 'https://mcb-frontend.up.railway.app').split('/')[0] + '//' + request.headers.get('Referer', 'https://mcb-frontend.up.railway.app').split('/')[2])
+    redirect_uri = f"{frontend_url}/auth/google/callback"
     return oauth.google.authorize_redirect(redirect_uri)
 
 

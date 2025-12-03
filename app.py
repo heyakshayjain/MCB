@@ -12,10 +12,6 @@ import secrets
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask_sock import Sock
-from routes_navigation import navigation_bp
-from routes_actions import actions_bp
-from routes_stream import handle_stream
 
 # Load environment variables from .env files if present (robust resolution)
 # 1) .env in project root (next to this file)
@@ -46,14 +42,6 @@ app = Flask(__name__)
 # Prefer SECRET_KEY from env; fall back to 'dev' for local/testing
 app.secret_key = os.getenv('SECRET_KEY', 'dev')  # Change this to a secure key in production
 Compress(app)  # Enable compression for better performance
-sock = Sock(app)
-
-app.register_blueprint(navigation_bp)
-app.register_blueprint(actions_bp)
-
-@sock.route('/stream')
-def stream_socket(ws):
-    handle_stream(ws)
 
 # Database configuration
 database_url = os.getenv('DATABASE_URL')
@@ -160,11 +148,6 @@ def login_required(view):
 
     return wrapped
 
-
-# Health check endpoint for Electron
-@app.route('/health')
-def health():
-    return jsonify({'status': 'ok'}), 200
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -617,7 +600,6 @@ if __name__ == '__main__':
     try:
         # Use PORT environment variable for Railway, default to 8000 for local development
         port = int(os.getenv('PORT', 8000))
-        print(f"Starting server on port {port}...")
         app.run(debug=True, host='0.0.0.0', port=port)
     except Exception as e:
         print(f"Error starting Flask server: {e}")

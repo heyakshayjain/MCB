@@ -18,5 +18,5 @@ env/
 
 # macOS
 .DS_Store
-
+mcb-website/node_modules
 mcb-frontend

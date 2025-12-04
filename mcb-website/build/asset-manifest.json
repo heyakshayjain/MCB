@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/collegebuddyapp/static/css/main.ee8256a2.css",
+    "main.js": "/collegebuddyapp/static/js/main.c0dc5980.js",
+    "index.html": "/collegebuddyapp/index.html",
+    "main.ee8256a2.css.map": "/collegebuddyapp/static/css/main.ee8256a2.css.map",
+    "main.c0dc5980.js.map": "/collegebuddyapp/static/js/main.c0dc5980.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ee8256a2.css",
+    "static/js/main.c0dc5980.js"
+  ]
+}

@@ -18,5 +18,31 @@ env/
 
 # macOS
 .DS_Store
-mcb-website/node_modules
-mcb-frontend
+
+# Node modules - but allow the folders themselves
+node_modules/
+dist/
+build/
+*.log
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# macOS
+*.DS_Store
+
+# Specific folders to ignore
+/mcb-frontend/

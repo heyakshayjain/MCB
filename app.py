@@ -106,8 +106,9 @@ from flask_cors import CORS
 CORS(app, origins=['https://mcb-frontend.up.railway.app', 'http://localhost:3000', 'http://localhost:3001'], supports_credentials=True, allow_headers=['Content-Type', 'Authorization'])
 
 # Session cookie tweaks for local dev
-app.config.setdefault('SESSION_COOKIE_SAMESITE', 'Lax')
-app.config.setdefault('SESSION_COOKIE_SECURE', False)  # True behind HTTPS
+# Session cookie tweaks for local dev
+app.config.setdefault('SESSION_COOKIE_SAMESITE', 'None')
+app.config.setdefault('SESSION_COOKIE_SECURE', True)  # True required for SameSite=None
 app.config.setdefault('SESSION_COOKIE_HTTPONLY', True)
 
 # Basic logging
@@ -235,7 +236,12 @@ def login_google():
         return jsonify({'error': 'Google OAuth not configured'}), 500
     # Start Google OAuth flow - use frontend URL for callback since Google redirects to frontend
     frontend_url = os.getenv('FRONTEND_URL', request.headers.get('Referer', 'https://mcb-frontend.up.railway.app').split('/')[0] + '//' + request.headers.get('Referer', 'https://mcb-frontend.up.railway.app').split('/')[2])
-    redirect_uri = f"{frontend_url}/auth/google/callback"
+    # redirect_uri = f"{frontend_url}/auth/google/callback"
+    # Ensure redirect_uri points to the BACKEND, not the frontend, because the route is here in app.py
+    redirect_uri = url_for('auth_google_callback', _external=True)
+    # If running behind a proxy (like Railway), force HTTPS if the scheme comes through as http but we know it's https
+    if 'railway.app' in redirect_uri and redirect_uri.startswith('http://'):
+        redirect_uri = redirect_uri.replace('http://', 'https://')
     return oauth.google.authorize_redirect(redirect_uri)
 
 
@@ -593,8 +599,9 @@ def api_mentor():
 
 
 # Create database tables
-with app.app_context():
-    db.create_all()
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
 
 if __name__ == '__main__':
     try:

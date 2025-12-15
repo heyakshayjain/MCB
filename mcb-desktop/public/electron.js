@@ -30,6 +30,37 @@ function createWindow() {
         mainWindow.webContents.openDevTools();
     }
 
+    // Handle external redirects (like OAuth)
+    mainWindow.webContents.on('will-navigate', (event, url) => {
+        console.log('will-navigate:', url);
+        const parsedUrl = new URL(url);
+        // If navigating to our backend dashboard (which happens after Google Login)
+        // We want to redirect back to our local app
+        if (url.includes('/dashboard') && !url.includes('localhost') && !url.startsWith('file://')) {
+            console.log('Intercepting dashboard redirect, redirecting to local app');
+            event.preventDefault();
+            // Redirect to local dashboard
+            const dashboardUrl = isDev
+                ? 'http://localhost:3000/#/dashboard'
+                : `file://${path.join(__dirname, '../build/index.html')}#/dashboard`;
+            mainWindow.loadURL(dashboardUrl);
+        }
+    });
+
+    // Handle successful login completion (when backend returns JSON)
+    mainWindow.webContents.on('did-navigate', (event, url) => {
+        console.log('did-navigate:', url);
+        if (url.includes('/auth/google/callback') && !url.includes('localhost')) {
+            console.log('Detected Google Auth callback JSON page, redirecting to local dashboard');
+            // Login successful (we are seeing the JSON response)
+            // Redirect to local dashboard
+            const dashboardUrl = isDev
+                ? 'http://localhost:3000/#/dashboard'
+                : `file://${path.join(__dirname, '../build/index.html')}#/dashboard`;
+            mainWindow.loadURL(dashboardUrl);
+        }
+    });
+
     mainWindow.on('closed', () => {
         mainWindow = null;
         browserViews.forEach(view => view.webContents.destroy());
